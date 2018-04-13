@@ -92,7 +92,7 @@ public class RoadSectionService {
 		return roadSectionIds;
 	}
 
-	public List<RoadSection> getAllRoadSections(Optional<String> roadId, Optional<Boolean> right,
+	public List<RoadSection> getAllRoadSections(Optional<String> roadId, Optional<Boolean> direction,
 			Optional<Double> beginKilometer, Optional<Double> endKilometer, Optional<String> drivewaySubtype)
 			throws IOException {
 		List<RoadSection> roadSections = new ArrayList<>();
@@ -110,8 +110,8 @@ public class RoadSectionService {
 			queryStr.setLiteral("roadNumber", roadId.get());
 			queryStr.append(";  nwb:roadNumber ?roadNumber ");
 		}
-		if (right.isPresent()) {
-			if (right.get()) {
+		if (direction.isPresent()) {
+			if (direction.get()) {
 				queryStr.append(";  nwb:relativePosition nwb:RelativePositionRight ");
 			} else {
 				queryStr.append(";  nwb:relativePosition nwb:RelativePositionLeft ");
@@ -134,8 +134,8 @@ public class RoadSectionService {
 						+ endKilometer.get() + "))");
 			}
 			queryStr.append(")");
-			queryStr.append(". ");
 		}
+		queryStr.append(". ");
 		if (drivewaySubtype.isPresent()) {
 			queryStr.setLiteral("drivewaySubtypeCode", drivewaySubtype.get());
 			queryStr.append("?roadsection  nwb:drivewaySubtype ?drivewaySubtype . ");

@@ -36,11 +36,11 @@ public class RoadSectionController {
 	@CrossOrigin
 	@RequestMapping("/roadsections")
 	public List<RoadSection> getAllRoadSections(@RequestParam("road") Optional<String> roadId,
-			@RequestParam("right") Optional<Boolean> right,
+			@RequestParam("direction") Optional<Boolean> direction,
 			@RequestParam("beginKilometer") Optional<Double> beginKilometer,
 			@RequestParam("endKilometer") Optional<Double> endKilometer,
 			@RequestParam("drivewaySubtype") Optional<String> drivewaySubtype) throws IOException {
-		return roadSectionService.getAllRoadSections(roadId, right, beginKilometer, endKilometer, drivewaySubtype);
+		return roadSectionService.getAllRoadSections(roadId, direction, beginKilometer, endKilometer, drivewaySubtype);
 	}
 
 	@CrossOrigin
