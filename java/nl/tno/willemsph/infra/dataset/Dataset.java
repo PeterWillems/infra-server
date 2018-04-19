@@ -1,6 +1,7 @@
 package nl.tno.willemsph.infra.dataset;
 
 import java.net.URI;
+import java.util.List;
 
 public class Dataset {
 	public static final String META_NAMESPACE = "https://w3id.org/meta#";
@@ -71,19 +72,21 @@ public class Dataset {
 	private String infraLabel;
 	private String road;
 	private String way;
+	private String lane;
 	private Double start;
 	private Double end;
 	private DecimalSymbol decimalSymbol;
 	private Separator separator;
 	private Format format;
 	private String ownerLabel;
+	private List<String> measurementYears;
 
 	public Dataset() {
 	}
 
 	public Dataset(String datasetLabel, URI dataReference, URI decimalSymbol, URI separator, URI format,
-			String projectLabel, String ownerLabel, String contactLabel, String infraLabel, String road, String way, Double start,
-			Double end) {
+			String projectLabel, String ownerLabel, String contactLabel, String infraLabel, String road, String way,
+			String lane, Double start, Double end) {
 		this.datasetLabel = datasetLabel;
 		this.dataReference = dataReference;
 		this.projectLabel = projectLabel;
@@ -92,6 +95,7 @@ public class Dataset {
 		this.infraLabel = infraLabel;
 		this.road = road;
 		this.way = way;
+		this.lane = lane;
 		this.start = start;
 		this.end = end;
 		this.decimalSymbol = DecimalSymbol.translate(decimalSymbol);
@@ -155,6 +159,14 @@ public class Dataset {
 		this.way = way;
 	}
 
+	public String getLane() {
+		return lane;
+	}
+
+	public void setLane(String lane) {
+		this.lane = lane;
+	}
+
 	public Double getStart() {
 		return start;
 	}
@@ -201,6 +213,14 @@ public class Dataset {
 
 	public void setOwnerLabel(String ownerLabel) {
 		this.ownerLabel = ownerLabel;
+	}
+
+	public List<String> getMeasurementYears() {
+		return measurementYears;
+	}
+
+	public void setMeasurementYears(List<String> measurementYears) {
+		this.measurementYears = measurementYears;
 	}
 
 }
