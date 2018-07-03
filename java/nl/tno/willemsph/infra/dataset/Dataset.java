@@ -1,10 +1,12 @@
 package nl.tno.willemsph.infra.dataset;
 
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 
 public class Dataset {
 	public static final String META_NAMESPACE = "https://w3id.org/meta#";
+	public static final String SPARONTOLOGIES_NAMESPACE = "http://www.sparontologies.net/mediatype/text/";
 
 	public enum DecimalSymbol {
 		COMMA, DOT;
@@ -17,6 +19,10 @@ public class Dataset {
 				return DOT;
 			}
 			return null;
+		}
+
+		public URI getUri() throws URISyntaxException {
+			return new URI(META_NAMESPACE + name());
 		}
 	}
 
@@ -36,6 +42,10 @@ public class Dataset {
 			}
 			return null;
 		}
+
+		public URI getUri() throws URISyntaxException {
+			return new URI(META_NAMESPACE + name());
+		}
 	}
 
 	public enum Format {
@@ -43,64 +53,78 @@ public class Dataset {
 
 		public static Format translate(URI format) {
 			switch (format.toString()) {
-			case META_NAMESPACE + "CSV":
+			case SPARONTOLOGIES_NAMESPACE + "csv":
 				return CSV;
-			case META_NAMESPACE + "XLS":
+			case SPARONTOLOGIES_NAMESPACE + "xls":
 				return XLS;
-			case META_NAMESPACE + "PDF":
+			case SPARONTOLOGIES_NAMESPACE + "pdf":
 				return PDF;
-			case META_NAMESPACE + "SPFF":
+			case SPARONTOLOGIES_NAMESPACE + "spff":
 				return SPFF;
-			case META_NAMESPACE + "XML":
+			case SPARONTOLOGIES_NAMESPACE + "xml":
 				return XML;
-			case META_NAMESPACE + "JSON":
+			case SPARONTOLOGIES_NAMESPACE + "json":
 				return JSON;
-			case META_NAMESPACE + "JSON_LD":
+			case SPARONTOLOGIES_NAMESPACE + "json_ld":
 				return JSON_LD;
-			case META_NAMESPACE + "TTL":
+			case SPARONTOLOGIES_NAMESPACE + "ttl":
 				return TTL;
 			}
 			return null;
 		}
 
+		public URI getUri() throws URISyntaxException {
+			return new URI(SPARONTOLOGIES_NAMESPACE + name());
+		}
+
 	}
 
+	private String datasetUri;
 	private String datasetLabel;
 	private URI dataReference;
+	private URI project;
 	private String projectLabel;
+	private URI contact;
 	private String contactLabel;
-	private String infraLabel;
-	private String road;
-	private String way;
-	private String lane;
-	private Double start;
-	private Double end;
+	private List<InfraObject> infraObjects;
 	private DecimalSymbol decimalSymbol;
 	private Separator separator;
 	private Format format;
+	private URI organisation;
 	private String ownerLabel;
 	private List<String> measurementYears;
+	private List<QuantityKindAndUnit> quantityKindAndUnits;
+	private URI topic;
+	private String topicLabel;
 
 	public Dataset() {
 	}
 
-	public Dataset(String datasetLabel, URI dataReference, URI decimalSymbol, URI separator, URI format,
-			String projectLabel, String ownerLabel, String contactLabel, String infraLabel, String road, String way,
-			String lane, Double start, Double end) {
+	public Dataset(String datasetUri, String datasetLabel, URI dataReference, URI decimalSymbol, URI separator,
+			URI format, URI project, String projectLabel, URI organisation, String ownerLabel, URI topic,
+			String topicLabel, URI contact, String contactLabel) {
+		this.datasetUri = datasetUri;
 		this.datasetLabel = datasetLabel;
 		this.dataReference = dataReference;
+		this.project = project;
 		this.projectLabel = projectLabel;
+		this.organisation = organisation;
 		this.ownerLabel = ownerLabel;
+		this.topic = topic;
+		this.topicLabel = topicLabel;
+		this.contact = contact;
 		this.contactLabel = contactLabel;
-		this.infraLabel = infraLabel;
-		this.road = road;
-		this.way = way;
-		this.lane = lane;
-		this.start = start;
-		this.end = end;
 		this.decimalSymbol = DecimalSymbol.translate(decimalSymbol);
 		this.separator = Separator.translate(separator);
 		this.format = Format.translate(format);
+	}
+
+	public String getDatasetUri() {
+		return datasetUri;
+	}
+
+	public void setDatasetUri(String datasetUri) {
+		this.datasetUri = datasetUri;
 	}
 
 	public String getDatasetLabel() {
@@ -119,6 +143,14 @@ public class Dataset {
 		this.dataReference = dataReference;
 	}
 
+	public URI getProject() {
+		return project;
+	}
+
+	public void setProject(URI project) {
+		this.project = project;
+	}
+
 	public String getProjectLabel() {
 		return projectLabel;
 	}
@@ -127,60 +159,20 @@ public class Dataset {
 		this.projectLabel = projectLabel;
 	}
 
+	public URI getContact() {
+		return contact;
+	}
+
+	public void setContact(URI contact) {
+		this.contact = contact;
+	}
+
 	public String getContactLabel() {
 		return contactLabel;
 	}
 
 	public void setContactLabel(String contactLabel) {
 		this.contactLabel = contactLabel;
-	}
-
-	public String getInfraLabel() {
-		return infraLabel;
-	}
-
-	public void setInfraLabel(String infraLabel) {
-		this.infraLabel = infraLabel;
-	}
-
-	public String getRoad() {
-		return road;
-	}
-
-	public void setRoad(String road) {
-		this.road = road;
-	}
-
-	public String getWay() {
-		return way;
-	}
-
-	public void setWay(String way) {
-		this.way = way;
-	}
-
-	public String getLane() {
-		return lane;
-	}
-
-	public void setLane(String lane) {
-		this.lane = lane;
-	}
-
-	public Double getStart() {
-		return start;
-	}
-
-	public void setStart(Double start) {
-		this.start = start;
-	}
-
-	public Double getEnd() {
-		return end;
-	}
-
-	public void setEnd(Double end) {
-		this.end = end;
 	}
 
 	public DecimalSymbol getDecimalSymbol() {
@@ -207,6 +199,14 @@ public class Dataset {
 		this.format = format;
 	}
 
+	public URI getOrganisation() {
+		return organisation;
+	}
+
+	public void setOrganisation(URI organisation) {
+		this.organisation = organisation;
+	}
+
 	public String getOwnerLabel() {
 		return ownerLabel;
 	}
@@ -221,6 +221,38 @@ public class Dataset {
 
 	public void setMeasurementYears(List<String> measurementYears) {
 		this.measurementYears = measurementYears;
+	}
+
+	public URI getTopic() {
+		return topic;
+	}
+
+	public void setTopic(URI topic) {
+		this.topic = topic;
+	}
+
+	public String getTopicLabel() {
+		return topicLabel;
+	}
+
+	public void setTopicLabel(String topicLabel) {
+		this.topicLabel = topicLabel;
+	}
+
+	public List<QuantityKindAndUnit> getQuantityKindAndUnits() {
+		return quantityKindAndUnits;
+	}
+
+	public void setQuantityKindAndUnits(List<QuantityKindAndUnit> quantityKindAndUnits) {
+		this.quantityKindAndUnits = quantityKindAndUnits;
+	}
+
+	public List<InfraObject> getInfraObjects() {
+		return infraObjects;
+	}
+
+	public void setInfraObjects(List<InfraObject> infraObjects) {
+		this.infraObjects = infraObjects;
 	}
 
 }

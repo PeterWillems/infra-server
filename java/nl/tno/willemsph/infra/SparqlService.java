@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @Service
 public class SparqlService {
 	public static final String QUERY_URL = "http://localhost:3330/rdf/query";
+	public static final String UPDATE_URL = "http://localhost:3330/rdf/update";
 	public static final String LIST_NS = "https://w3id.org/list#";
 	public static final String HOOFDWEGENNET_NS = "https://w3id.org/nwb/hoofdwegennet#";
 	public static final String HOOFDWEGENNET_DATA = "https://w3id.org/nwb/hoofdwegennet/data";
@@ -87,9 +88,15 @@ public class SparqlService {
 
 	public JsonNode query(ParameterizedSparqlString queryStr) throws IOException {
 		String query = queryStr.toString();
-		HttpURLConnection con = getConnection();
+		HttpURLConnection con = getQueryConnection();
 		JsonNode bindings = send(con, query);
 		return bindings;
+	}
+	
+	public void update(ParameterizedSparqlString queryStr) throws IOException {
+		String query = queryStr.toString();
+		HttpURLConnection con = getUpdateConnection();
+		sendUpdate(con, query);
 	}
 
 	public PrefixMapping getPrefixMapping() {
@@ -105,7 +112,7 @@ public class SparqlService {
 		return prefixMapping;
 	}
 
-	private HttpURLConnection getConnection() throws IOException {
+	private HttpURLConnection getQueryConnection() throws IOException {
 		URL obj = new URL(QUERY_URL);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
@@ -113,6 +120,28 @@ public class SparqlService {
 		con.setRequestMethod("POST");
 		con.setRequestProperty("Content-Type", "application/sparql-query");
 		return con;
+	}
+	
+	private HttpURLConnection getUpdateConnection() throws IOException {
+		URL obj = new URL(UPDATE_URL);
+		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+
+		// add request header
+		con.setRequestMethod("POST");
+		con.setRequestProperty("Content-Type", "application/sparql-update");
+		return con;
+	}
+	
+	private void sendUpdate(HttpURLConnection con, String query) throws IOException {
+		con.setDoOutput(true);
+		DataOutputStream wr = new DataOutputStream(con.getOutputStream());
+		wr.writeBytes(query);
+		wr.flush();
+		wr.close();
+		int responseCode = con.getResponseCode();
+		System.out.println("\nSending 'POST' request to URL : " + SparqlService.class);
+		System.out.println("Post parameters : " + query);
+		System.out.println("Response Code : " + responseCode);
 	}
 
 	private JsonNode send(HttpURLConnection con, String query) throws IOException {
