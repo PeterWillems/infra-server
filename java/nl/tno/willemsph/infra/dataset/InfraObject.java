@@ -1,7 +1,10 @@
 package nl.tno.willemsph.infra.dataset;
 
+import java.net.URI;
+
 public class InfraObject {
-	private String infraLabel;
+	private URI uri;
+	private String label;
 	private String road;
 	private String way;
 	private String lane;
@@ -11,8 +14,9 @@ public class InfraObject {
 	public InfraObject() {
 	}
 
-	public InfraObject(String infraLabel, String road, String way, String lane, Double start, Double end) {
-		this.infraLabel = infraLabel;
+	public InfraObject(URI uri, String label, String road, String way, String lane, Double start, Double end) {
+		this.uri = uri;
+		this.label = label;
 		this.road = road;
 		this.way = way;
 		this.lane = lane;
@@ -20,12 +24,20 @@ public class InfraObject {
 		this.end = end;
 	}
 
-	public String getInfraLabel() {
-		return infraLabel;
+	public URI getUri() {
+		return uri;
 	}
 
-	public void setInfraLabel(String infraLabel) {
-		this.infraLabel = infraLabel;
+	public void setUri(URI uri) {
+		this.uri = uri;
+	}
+
+	public String getLabel() {
+		return label;
+	}
+
+	public void setLabel(String label) {
+		this.label = label;
 	}
 
 	public String getRoad() {

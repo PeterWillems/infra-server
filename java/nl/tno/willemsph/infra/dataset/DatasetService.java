@@ -39,7 +39,7 @@ public class DatasetService {
 		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
 		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
 		queryStr.append(
-				"SELECT DISTINCT ?dataset ?datasetLabel ?dataReference ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraLabel ?road ?way ?lane ?start ?end ");
+				"SELECT DISTINCT ?dataset ?datasetLabel ?dataReference ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?dataset rdf:type meta:File ;");
 		queryStr.append("    rdfs:label ?datasetLabel ;");
@@ -85,6 +85,7 @@ public class DatasetService {
 			URI decimalSymbol = new URI(node.get("decimalSymbol").get("value").asText());
 			URI separator = new URI(node.get("separator").get("value").asText());
 			URI format = new URI(node.get("format").get("value").asText());
+			URI infraObjectUri = new URI(node.get("infraObject").get("value").asText());
 			String infraLabel = node.get("infraLabel").get("value").asText();
 			String road = node.get("road").get("value").asText();
 			String way = node.get("way").get("value").asText();
@@ -100,9 +101,10 @@ public class DatasetService {
 			}
 			List<String> measurementYears = getMeasurementYears(node.get("dataset").get("value").asText());
 			dataset.setMeasurementYears(measurementYears);
-			List<QuantityKindAndUnit> quantityKindAndUnits = getQuantityKindAndUnits(node.get("dataset").get("value").asText());
+			List<QuantityKindAndUnit> quantityKindAndUnits = getQuantityKindAndUnits(
+					node.get("dataset").get("value").asText());
 			dataset.setQuantityKindAndUnits(quantityKindAndUnits);
-			InfraObject infraObject = new InfraObject(infraLabel, road, way, lane, start, end);
+			InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
 			infraObjects.add(infraObject);
 			dataset.setInfraObjects(infraObjects);
 		}
@@ -117,7 +119,7 @@ public class DatasetService {
 		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
 		queryStr.setIri("dataset", datasetId);
 		queryStr.append(
-				"SELECT DISTINCT ?datasetLabel ?dataReference ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraLabel ?road ?way ?lane ?start ?end ");
+				"SELECT DISTINCT ?datasetLabel ?dataReference ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?dataset rdfs:label ?datasetLabel ;");
 		queryStr.append("    meta:forProject ?project ;");
@@ -161,6 +163,7 @@ public class DatasetService {
 			URI decimalSymbol = new URI(node.get("decimalSymbol").get("value").asText());
 			URI separator = new URI(node.get("separator").get("value").asText());
 			URI format = new URI(node.get("format").get("value").asText());
+			URI infraObjectUri = new URI(node.get("infraObject").get("value").asText());
 			String infraLabel = node.get("infraLabel").get("value").asText();
 			String road = node.get("road").get("value").asText();
 			String way = node.get("way").get("value").asText();
@@ -177,7 +180,7 @@ public class DatasetService {
 			dataset.setMeasurementYears(measurementYears);
 			List<QuantityKindAndUnit> quantityKindAndUnits = getQuantityKindAndUnits(datasetId);
 			dataset.setQuantityKindAndUnits(quantityKindAndUnits);
-			InfraObject infraObject = new InfraObject(infraLabel, road, way, lane, start, end);
+			InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
 			infraObjects.add(infraObject);
 			dataset.setInfraObjects(infraObjects);
 		}
@@ -273,7 +276,12 @@ public class DatasetService {
 		if (!storedDataset.getFormat().equals(updatedDataset.getFormat())) {
 			updateFormatOfDataset(updatedDataset);
 		}
+		if (!storedDataset.getDataReference().equals(updatedDataset.getDataReference())) {
+			updateDataReferenceOfDataset(updatedDataset);
+		}
 		updateMeasurementYears(storedDataset, updatedDataset);
+		updateQuantities(storedDataset, updatedDataset);
+		updateInfraObjects(storedDataset, updatedDataset);
 		return getDataset(localName);
 	}
 
@@ -320,6 +328,90 @@ public class DatasetService {
 		}
 	}
 
+	private void updateQuantities(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+		boolean doUpdate = false;
+		for (QuantityKindAndUnit quantity : storedDataset.getQuantityKindAndUnits()) {
+			if (!updatedDataset.getQuantityKindAndUnits().contains(quantity)) {
+				doUpdate = true;
+				break;
+			}
+		}
+		if (!doUpdate) {
+			for (QuantityKindAndUnit quantity : updatedDataset.getQuantityKindAndUnits()) {
+				if (!storedDataset.getQuantityKindAndUnits().contains(quantity)) {
+					doUpdate = true;
+					break;
+				}
+			}
+		}
+		if (doUpdate) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+			queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+			queryStr.setIri("dataset", storedDataset.getDatasetUri());
+			queryStr.append("DELETE { ?dataset meta:quantityKindAndUnit ?quantity . } ");
+			queryStr.append("WHERE {");
+			queryStr.append("  ?dataset rdf:type meta:File ;");
+			queryStr.append("    meta:quantityKindAndUnit ?quantity .");
+			queryStr.append("}");
+			fuseki.update(queryStr);
+
+			for (QuantityKindAndUnit quantity : updatedDataset.getQuantityKindAndUnits()) {
+				queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+				queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+				queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+				queryStr.setIri("dataset", storedDataset.getDatasetUri());
+				queryStr.setIri("quantity", quantity.getUri().toString());
+				queryStr.append("INSERT { ?dataset meta:quantityKindAndUnit ?quantity . } ");
+				queryStr.append("WHERE {");
+				queryStr.append("}");
+				fuseki.update(queryStr);
+			}
+		}
+	}
+	
+	private void updateInfraObjects(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+		boolean doUpdate = false;
+		for (InfraObject infraObject : storedDataset.getInfraObjects()) {
+			if (!updatedDataset.getInfraObjects().contains(infraObject)) {
+				doUpdate = true;
+				break;
+			}
+		}
+		if (!doUpdate) {
+			for (InfraObject infraObject : updatedDataset.getInfraObjects()) {
+				if (!storedDataset.getInfraObjects().contains(infraObject)) {
+					doUpdate = true;
+					break;
+				}
+			}
+		}
+		if (doUpdate) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+			queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+			queryStr.setIri("dataset", storedDataset.getDatasetUri());
+			queryStr.append("DELETE { ?dataset meta:relatedToInfraObject ?infra_object . } ");
+			queryStr.append("WHERE {");
+			queryStr.append("  ?dataset rdf:type meta:File ;");
+			queryStr.append("    meta:relatedToInfraObject ?infra_object .");
+			queryStr.append("}");
+			fuseki.update(queryStr);
+
+			for (InfraObject infraObject : updatedDataset.getInfraObjects()) {
+				queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+				queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+				queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+				queryStr.setIri("dataset", storedDataset.getDatasetUri());
+				queryStr.setIri("infra_object", infraObject.getUri().toString());
+				queryStr.append("INSERT { ?dataset meta:relatedToInfraObject ?infra_object . } ");
+				queryStr.append("WHERE {");
+				queryStr.append("}");
+				fuseki.update(queryStr);
+			}
+		}
+	}
+
 	private void updateLabelOfDataset(Dataset dataset) throws IOException {
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
 		queryStr.setIri("subject", dataset.getDatasetUri());
@@ -340,6 +432,19 @@ public class DatasetService {
 		queryStr.append("  DELETE { ?subject meta:forProject ?project } ");
 		queryStr.append("  INSERT { ?subject meta:forProject ?new_project } ");
 		queryStr.append("WHERE { ?subject meta:forProject ?project . ");
+		queryStr.append("}");
+
+		fuseki.update(queryStr);
+	}
+
+	private void updateDataReferenceOfDataset(Dataset dataset) throws IOException {
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+		queryStr.setIri("subject", dataset.getDatasetUri());
+		queryStr.setIri("new_datareference", dataset.getDataReference().toString());
+		queryStr.append("  DELETE { ?subject meta:dataReference ?datareference } ");
+		queryStr.append("  INSERT { ?subject meta:dataReference ?new_datareference } ");
+		queryStr.append("WHERE { ?subject meta:dataReference ?datareference . ");
 		queryStr.append("}");
 
 		fuseki.update(queryStr);
@@ -607,7 +712,75 @@ public class DatasetService {
 		}
 		return topic;
 	}
-	
+
+	public List<InfraObject> getAllInfraObjects() throws IOException, URISyntaxException {
+		List<InfraObject> infraObjects = new ArrayList<>();
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.append("SELECT DISTINCT ?uri ?label ?road ?way ?lane ?start ?end ");
+		queryStr.append("WHERE {");
+		queryStr.append("  ?uri rdf:type meta:RoadPart ;");
+		queryStr.append("    rdfs:label ?label ;");
+		queryStr.append("    meta:endRoadNetworkLocation ?endLocation ;");
+		queryStr.append("    meta:startRoadNetworkLocation ?startLocation .");
+		queryStr.append("  ?endLocation meta:hectometerPostReference ?end ;");
+		queryStr.append("    meta:laneReference ?lane ;");
+		queryStr.append("    meta:roadReference ?road ;");
+		queryStr.append("    meta:wayReference ?way .");
+		queryStr.append("  ?startLocation meta:hectometerPostReference ?start .");
+		queryStr.append("}");
+		queryStr.append("ORDER BY ?label");
+		JsonNode responseNodes = fuseki.query(queryStr);
+		InfraObject infraObject = null;
+		for (JsonNode node : responseNodes) {
+			URI uri = new URI(node.get("uri").get("value").asText());
+			String label = node.get("label").get("value").asText();
+			String road = node.get("road").get("value").asText();
+			String way = node.get("way").get("value").asText();
+			String lane = node.get("lane").get("value").asText();
+			Double start = Double.parseDouble(node.get("start").get("value").textValue().replace(',', '.'));
+			Double end = Double.parseDouble(node.get("end").get("value").textValue().replace(',', '.'));
+			infraObject = new InfraObject(uri, label, road, way, lane, start, end);
+			infraObjects.add(infraObject);
+		}
+		return infraObjects;
+	}
+
+	public InfraObject getInfraObject(String localName) throws IOException, URISyntaxException {
+		URI uri = new URI("https://w3id.org/meta#" + localName);
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setIri("uri", uri.toString());
+		queryStr.append("SELECT DISTINCT ?label ?road ?way ?lane ?start ?end ");
+		queryStr.append("WHERE {");
+		queryStr.append("  ?uri rdf:type meta:RoadPart ;");
+		queryStr.append("    rdfs:label ?label ;");
+		queryStr.append("    meta:endRoadNetworkLocation ?endLocation ;");
+		queryStr.append("    meta:startRoadNetworkLocation ?startLocation .");
+		queryStr.append("  ?endLocation meta:hectometerPostReference ?end ;");
+		queryStr.append("    meta:laneReference ?lane ;");
+		queryStr.append("    meta:roadReference ?road ;");
+		queryStr.append("    meta:wayReference ?way .");
+		queryStr.append("  ?startLocation meta:hectometerPostReference ?start .");
+		queryStr.append("}");
+		JsonNode responseNodes = fuseki.query(queryStr);
+		InfraObject infraObject = null;
+		for (JsonNode node : responseNodes) {
+			String label = node.get("label").get("value").asText();
+			String road = node.get("road").get("value").asText();
+			String way = node.get("way").get("value").asText();
+			String lane = node.get("lane").get("value").asText();
+			Double start = Double.parseDouble(node.get("start").get("value").textValue().replace(',', '.'));
+			Double end = Double.parseDouble(node.get("end").get("value").textValue().replace(',', '.'));
+			infraObject = new InfraObject(uri, label, road, way, lane, start, end);
+		}
+		return infraObject;
+	}
+
 	public List<QuantityKindAndUnit> getAllQuantities() throws IOException, URISyntaxException {
 		List<QuantityKindAndUnit> quantities = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());

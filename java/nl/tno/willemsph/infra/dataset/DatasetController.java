@@ -72,6 +72,18 @@ public class DatasetController {
 	public Topic getTopic(@PathVariable String localName) throws IOException, URISyntaxException {
 		return datasetService.getTopic(localName);
 	}
+	
+	@CrossOrigin
+	@RequestMapping("/infra-objects")
+	public List<InfraObject> getAllInfraObjects() throws IOException, URISyntaxException {
+		return datasetService.getAllInfraObjects();
+	}
+
+	@CrossOrigin
+	@RequestMapping("/infra-objects/{localName}")
+	public InfraObject getInfraObject(@PathVariable String localName) throws IOException, URISyntaxException {
+		return datasetService.getInfraObject(localName);
+	}
 
 	@CrossOrigin
 	@RequestMapping("/quantities")
