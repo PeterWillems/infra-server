@@ -43,8 +43,7 @@ public class SparqlService {
 			"011", "012", "013", "014", "015", "016", "017", "020", "022", "027", "028", //
 			"030", "031", "032", "033", "035", "036", "037", "038", "044", "046", "048", //
 			"050", "057", "058", "059", "061", "065", "067", "073", "074", "076", "077", "079", //
-			"099", "200", "205", "708", "783", "835", "838", "915"
-	};
+			"099", "200", "205", "708", "783", "835", "838", "915" };
 
 	private FusekiServer fuseki;
 	private Dataset ds;
@@ -56,6 +55,7 @@ public class SparqlService {
 		Resource nwb = new ClassPathResource(NWB_RESOURCE);
 		Resource meta = new ClassPathResource(META_RESOURCE);
 		Resource metadata = new ClassPathResource(METADATA_RESOURCE);
+		System.out.println(metadata.getFile().getAbsolutePath());
 
 		defaultModel.read(nwb.getInputStream(), null, "TURTLE");
 		defaultModel.read(meta.getInputStream(), null, "TURTLE");
@@ -92,7 +92,7 @@ public class SparqlService {
 		JsonNode bindings = send(con, query);
 		return bindings;
 	}
-	
+
 	public void update(ParameterizedSparqlString queryStr) throws IOException {
 		String query = queryStr.toString();
 		HttpURLConnection con = getUpdateConnection();
@@ -121,7 +121,7 @@ public class SparqlService {
 		con.setRequestProperty("Content-Type", "application/sparql-query");
 		return con;
 	}
-	
+
 	private HttpURLConnection getUpdateConnection() throws IOException {
 		URL obj = new URL(UPDATE_URL);
 		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
@@ -131,7 +131,7 @@ public class SparqlService {
 		con.setRequestProperty("Content-Type", "application/sparql-update");
 		return con;
 	}
-	
+
 	private void sendUpdate(HttpURLConnection con, String query) throws IOException {
 		con.setDoOutput(true);
 		DataOutputStream wr = new DataOutputStream(con.getOutputStream());

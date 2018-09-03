@@ -8,7 +8,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -28,6 +32,9 @@ import nl.tno.willemsph.infra.SparqlService;
 
 @Service
 public class DatasetService {
+	public static final String META = "https://w3id.org/meta#";
+	public static final String METADATA = "https://w3id.org/metadata#";
+	public static final String DCE = "http://purl.org/dc/elements/1.1/";
 
 	@Autowired
 	private SparqlService fuseki;
@@ -35,35 +42,47 @@ public class DatasetService {
 	public List<Dataset> getAllDatasets() throws IOException, URISyntaxException {
 		List<Dataset> datasets = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append(
-				"SELECT DISTINCT ?dataset ?datasetLabel ?dataReference ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
+				"SELECT DISTINCT ?dataset ?datasetLabel ?dataReference ?measurementStartDate ?measurementEndDate ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
-		queryStr.append("  ?dataset rdf:type meta:File ;");
-		queryStr.append("    rdfs:label ?datasetLabel ;");
-		queryStr.append("    meta:forProject ?project ;");
-		queryStr.append("    meta:hasOwner ?organisation ;");
-		queryStr.append("    meta:hasTopic ?topic ;");
-		queryStr.append("    meta:contactPerson ?contact ;");
-		queryStr.append("    meta:csvDecimalSymbol ?decimalSymbol ;");
-		queryStr.append("    meta:csvSeparatorSymbol ?separator ;");
-		queryStr.append("    dce:format ?format ;");
-		queryStr.append("    meta:dataReference ?dataReference ;");
-		queryStr.append("    meta:relatedToInfraObject ?infraObject .");
-		queryStr.append("  ?project rdfs:label ?projectLabel .");
-		queryStr.append("  ?organisation rdfs:label ?ownerLabel .");
-		queryStr.append("  ?topic rdfs:label ?topicLabel . FILTER (lang(?topicLabel) = 'en') ");
-		queryStr.append("  ?contact rdfs:label ?contactLabel .");
-		queryStr.append("  ?infraObject rdfs:label ?infraLabel ;");
-		queryStr.append("    meta:startRoadNetworkLocation ?startLocation ;");
-		queryStr.append("    meta:endRoadNetworkLocation ?endLocation .");
-		queryStr.append("  ?startLocation meta:roadReference ?road ;");
-		queryStr.append("    meta:wayReference ?way ;");
-		queryStr.append("    meta:laneReference ?lane ;");
-		queryStr.append("    meta:hectometerPostReference ?start .");
-		queryStr.append("  ?endLocation meta:hectometerPostReference ?end .");
+		queryStr.append("  ?dataset rdf:type meta:File .");
+		queryStr.append("  ?dataset rdfs:label ?datasetLabel .");
+		queryStr.append("  OPTIONAL {    ?dataset meta:csvDecimalSymbol ?decimalSymbol . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:csvSeparatorSymbol ?separator . } ");
+		queryStr.append("  OPTIONAL {    ?dataset dce:format ?format . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:dataReference ?dataReference . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:measurementStartDate ?measurementStartDate . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:measurementEndDate ?measurementEndDate . } ");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:forProject ?project . ");
+		queryStr.append("    ?project rdfs:label ?projectLabel . ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:hasOwner ?organisation . ");
+		queryStr.append("    ?organisation rdfs:label ?ownerLabel . ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("     ?dataset meta:hasTopic ?topic . ");
+		queryStr.append("     ?topic rdfs:label ?topicLabel . FILTER (lang(?topicLabel) = 'en') ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:contactPerson ?contact .  ");
+		queryStr.append("    ?contact rdfs:label ?contactLabel .  ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("      ?dataset meta:relatedToInfraObject ?infraObject . ");
+		queryStr.append("      ?infraObject rdfs:label ?infraLabel .  ");
+		queryStr.append("      ?infraObject meta:startRoadNetworkLocation ?startLocation .  ");
+		queryStr.append("      ?infraObject meta:endRoadNetworkLocation ?endLocation .  ");
+		queryStr.append("      ?startLocation meta:roadReference ?road .  ");
+		queryStr.append("      ?startLocation meta:wayReference ?way . ");
+		queryStr.append("      ?startLocation meta:laneReference ?lane .  ");
+		queryStr.append("      ?startLocation meta:hectometerPostReference ?start .  ");
+		queryStr.append("      ?endLocation meta:hectometerPostReference ?end .  ");
+		queryStr.append("  }");
 		queryStr.append("}");
 		queryStr.append("ORDER BY ?datasetLabel");
 		JsonNode responseNodes = fuseki.query(queryStr);
@@ -73,28 +92,58 @@ public class DatasetService {
 		for (JsonNode node : responseNodes) {
 			String datasetId = node.get("dataset").get("value").asText();
 			String datasetLabel = node.get("datasetLabel").get("value").asText();
-			URI dataReference = new URI(node.get("dataReference").get("value").asText());
-			URI project = new URI(node.get("project").get("value").asText());
-			String projectLabel = node.get("projectLabel").get("value").asText();
-			URI organisation = new URI(node.get("organisation").get("value").asText());
-			String ownerLabel = node.get("ownerLabel").get("value").asText();
-			URI topic = new URI(node.get("topic").get("value").asText());
-			String topicLabel = node.get("topicLabel").get("value").asText();
-			URI contact = new URI(node.get("contact").get("value").asText());
-			String contactLabel = node.get("contactLabel").get("value").asText();
-			URI decimalSymbol = new URI(node.get("decimalSymbol").get("value").asText());
-			URI separator = new URI(node.get("separator").get("value").asText());
-			URI format = new URI(node.get("format").get("value").asText());
-			URI infraObjectUri = new URI(node.get("infraObject").get("value").asText());
-			String infraLabel = node.get("infraLabel").get("value").asText();
-			String road = node.get("road").get("value").asText();
-			String way = node.get("way").get("value").asText();
-			String lane = node.get("lane").get("value").asText();
-			Double start = Double.parseDouble(node.get("start").get("value").textValue().replace(',', '.'));
-			Double end = Double.parseDouble(node.get("end").get("value").textValue().replace(',', '.'));
+			JsonNode dataReferenceNode = node.get("dataReference");
+			URI dataReference = dataReferenceNode != null ? new URI(dataReferenceNode.get("value").asText()) : null;
+			JsonNode measurementStartDateNode = node.get("measurementStartDate");
+			Date measurementStartDate = measurementStartDateNode != null
+					? DatatypeConverter.parseDateTime(measurementStartDateNode.get("value").asText()).getTime()
+					: null;
+			JsonNode measurementEndDateNode = node.get("measurementEndDate");
+			Date measurementEndDate = measurementEndDateNode != null
+					? DatatypeConverter.parseDateTime(measurementEndDateNode.get("value").asText()).getTime()
+					: null;
+			JsonNode projectNode = node.get("project");
+			URI project = projectNode != null ? new URI(projectNode.get("value").asText()) : null;
+			JsonNode projectLabelNode = node.get("projectLabel");
+			String projectLabel = projectLabelNode != null ? projectLabelNode.get("value").asText() : null;
+			JsonNode organisationNode = node.get("organisation");
+			URI organisation = organisationNode != null ? new URI(organisationNode.get("value").asText()) : null;
+			JsonNode ownerLabelNode = node.get("ownerLabel");
+			String ownerLabel = ownerLabelNode != null ? ownerLabelNode.get("value").asText() : null;
+			JsonNode topicNode = node.get("topic");
+			URI topic = topicNode != null ? new URI(topicNode.get("value").asText()) : null;
+			JsonNode topicLabelNode = node.get("topicLabel");
+			String topicLabel = topicLabelNode != null ? topicLabelNode.get("value").asText() : null;
+			JsonNode contactNode = node.get("contact");
+			URI contact = contactNode != null ? new URI(contactNode.get("value").asText()) : null;
+			JsonNode contactLabelNode = node.get("contactLabel");
+			String contactLabel = contactLabelNode != null ? contactLabelNode.get("value").asText() : null;
+			JsonNode decimalSymbolNode = node.get("decimalSymbol");
+			URI decimalSymbol = decimalSymbolNode != null ? new URI(decimalSymbolNode.get("value").asText()) : null;
+			JsonNode separatorNode = node.get("separator");
+			URI separator = separatorNode != null ? new URI(separatorNode.get("value").asText()) : null;
+			JsonNode formatNode = node.get("format");
+			URI format = formatNode != null ? new URI(formatNode.get("value").asText()) : null;
+			JsonNode infraObjectNode = node.get("infraObject");
+			URI infraObjectUri = infraObjectNode != null ? new URI(infraObjectNode.get("value").asText()) : null;
+			JsonNode infraLabelNode = node.get("infraLabel");
+			String infraLabel = infraLabelNode != null ? infraLabelNode.get("value").asText() : null;
+			JsonNode roadNode = node.get("road");
+			String road = roadNode != null ? roadNode.get("value").asText() : null;
+			JsonNode wayNode = node.get("way");
+			String way = wayNode != null ? wayNode.get("value").asText() : null;
+			JsonNode laneNode = node.get("lane");
+			String lane = laneNode != null ? laneNode.get("value").asText() : null;
+			JsonNode startNode = node.get("start");
+			Double start = startNode != null ? Double.parseDouble(startNode.get("value").textValue().replace(',', '.'))
+					: null;
+			JsonNode endNode = node.get("end");
+			Double end = endNode != null ? Double.parseDouble(endNode.get("value").textValue().replace(',', '.'))
+					: null;
 			if (!datasetId.equals(lastDatasetId)) {
-				dataset = new Dataset(datasetId, datasetLabel, dataReference, decimalSymbol, separator, format, project,
-						projectLabel, organisation, ownerLabel, topic, topicLabel, contact, contactLabel);
+				dataset = new Dataset(datasetId, datasetLabel, dataReference, measurementStartDate, measurementEndDate,
+						decimalSymbol, separator, format, project, projectLabel, organisation, ownerLabel, topic,
+						topicLabel, contact, contactLabel);
 				datasets.add(dataset);
 				infraObjects = new ArrayList<>();
 				lastDatasetId = datasetId;
@@ -104,45 +153,59 @@ public class DatasetService {
 			List<QuantityKindAndUnit> quantityKindAndUnits = getQuantityKindAndUnits(
 					node.get("dataset").get("value").asText());
 			dataset.setQuantityKindAndUnits(quantityKindAndUnits);
-			InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
-			infraObjects.add(infraObject);
+			if (infraObjectUri != null) {
+				InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
+				infraObjects.add(infraObject);
+			}
 			dataset.setInfraObjects(infraObjects);
 		}
 		return datasets;
 	}
 
 	public Dataset getDataset(String localName) throws IOException, URISyntaxException {
-		String datasetId = "https://w3id.org/metadata#" + localName;
+		String datasetId = METADATA + localName;
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("dataset", datasetId);
 		queryStr.append(
-				"SELECT DISTINCT ?datasetLabel ?dataReference ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
+				"SELECT DISTINCT ?datasetLabel ?dataReference ?measurementStartDate ?measurementEndDate ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
-		queryStr.append("  ?dataset rdfs:label ?datasetLabel ;");
-		queryStr.append("    meta:forProject ?project ;");
-		queryStr.append("    meta:hasOwner ?organisation ;");
-		queryStr.append("    meta:hasTopic ?topic ;");
-		queryStr.append("    meta:contactPerson ?contact ;");
-		queryStr.append("    meta:csvDecimalSymbol ?decimalSymbol ;");
-		queryStr.append("    meta:csvSeparatorSymbol ?separator ;");
-		queryStr.append("    dce:format ?format ;");
-		queryStr.append("    meta:dataReference ?dataReference ;");
-		queryStr.append("    meta:relatedToInfraObject ?infraObject .");
-		queryStr.append("  ?project rdfs:label ?projectLabel .");
-		queryStr.append("  ?organisation rdfs:label ?ownerLabel .");
-		queryStr.append("  ?topic rdfs:label ?topicLabel . FILTER (lang(?topicLabel) = 'en') ");
-		queryStr.append("  ?contact rdfs:label ?contactLabel .");
-		queryStr.append("  ?infraObject rdfs:label ?infraLabel ;");
-		queryStr.append("    meta:startRoadNetworkLocation ?startLocation ;");
-		queryStr.append("    meta:endRoadNetworkLocation ?endLocation .");
-		queryStr.append("  ?startLocation meta:roadReference ?road ;");
-		queryStr.append("    meta:wayReference ?way ;");
-		queryStr.append("    meta:laneReference ?lane ;");
-		queryStr.append("    meta:hectometerPostReference ?start .");
-		queryStr.append("  ?endLocation meta:hectometerPostReference ?end .");
+		queryStr.append("  ?dataset rdfs:label ?datasetLabel .");
+		queryStr.append("  OPTIONAL {    ?dataset meta:csvDecimalSymbol ?decimalSymbol . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:csvSeparatorSymbol ?separator . } ");
+		queryStr.append("  OPTIONAL {    ?dataset dce:format ?format . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:dataReference ?dataReference . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:measurementStartDate ?measurementStartDate . } ");
+		queryStr.append("  OPTIONAL {    ?dataset meta:measurementEndDate ?measurementEndDate . } ");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:forProject ?project . ");
+		queryStr.append("    ?project rdfs:label ?projectLabel . ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:hasOwner ?organisation . ");
+		queryStr.append("    ?organisation rdfs:label ?ownerLabel . ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("     ?dataset meta:hasTopic ?topic . ");
+		queryStr.append("     ?topic rdfs:label ?topicLabel . FILTER (lang(?topicLabel) = 'en') ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:contactPerson ?contact .  ");
+		queryStr.append("    ?contact rdfs:label ?contactLabel .  ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("      ?dataset meta:relatedToInfraObject ?infraObject . ");
+		queryStr.append("      ?infraObject rdfs:label ?infraLabel .  ");
+		queryStr.append("      ?infraObject meta:startRoadNetworkLocation ?startLocation .  ");
+		queryStr.append("      ?infraObject meta:endRoadNetworkLocation ?endLocation .  ");
+		queryStr.append("      ?startLocation meta:roadReference ?road .  ");
+		queryStr.append("      ?startLocation meta:wayReference ?way . ");
+		queryStr.append("      ?startLocation meta:laneReference ?lane .  ");
+		queryStr.append("      ?startLocation meta:hectometerPostReference ?start .  ");
+		queryStr.append("      ?endLocation meta:hectometerPostReference ?end .  ");
+		queryStr.append("  }");
 		queryStr.append("}");
 		queryStr.append("ORDER BY ?datasetLabel");
 		JsonNode responseNodes = fuseki.query(queryStr);
@@ -151,28 +214,58 @@ public class DatasetService {
 		List<InfraObject> infraObjects = null;
 		for (JsonNode node : responseNodes) {
 			String datasetLabel = node.get("datasetLabel").get("value").asText();
-			URI dataReference = new URI(node.get("dataReference").get("value").asText());
-			URI project = new URI(node.get("project").get("value").asText());
-			String projectLabel = node.get("projectLabel").get("value").asText();
-			URI organisation = new URI(node.get("organisation").get("value").asText());
-			String ownerLabel = node.get("ownerLabel").get("value").asText();
-			URI topic = new URI(node.get("topic").get("value").asText());
-			String topicLabel = node.get("topicLabel").get("value").asText();
-			URI contact = new URI(node.get("contact").get("value").asText());
-			String contactLabel = node.get("contactLabel").get("value").asText();
-			URI decimalSymbol = new URI(node.get("decimalSymbol").get("value").asText());
-			URI separator = new URI(node.get("separator").get("value").asText());
-			URI format = new URI(node.get("format").get("value").asText());
-			URI infraObjectUri = new URI(node.get("infraObject").get("value").asText());
-			String infraLabel = node.get("infraLabel").get("value").asText();
-			String road = node.get("road").get("value").asText();
-			String way = node.get("way").get("value").asText();
-			String lane = node.get("lane").get("value").asText();
-			Double start = Double.parseDouble(node.get("start").get("value").textValue().replace(',', '.'));
-			Double end = Double.parseDouble(node.get("end").get("value").textValue().replace(',', '.'));
+			JsonNode dataReferenceNode = node.get("dataReference");
+			URI dataReference = dataReferenceNode != null ? new URI(dataReferenceNode.get("value").asText()) : null;
+			JsonNode measurementStartDateNode = node.get("measurementStartDate");
+			Date measurementStartDate = measurementStartDateNode != null
+					? DatatypeConverter.parseDate(measurementStartDateNode.get("value").asText()).getTime()
+					: null;
+			JsonNode measurementEndDateNode = node.get("measurementEndDate");
+			Date measurementEndDate = measurementEndDateNode != null
+					? DatatypeConverter.parseDate(measurementEndDateNode.get("value").asText()).getTime()
+					: null;
+			JsonNode projectNode = node.get("project");
+			URI project = projectNode != null ? new URI(projectNode.get("value").asText()) : null;
+			JsonNode projectLabelNode = node.get("projectLabel");
+			String projectLabel = projectLabelNode != null ? projectLabelNode.get("value").asText() : null;
+			JsonNode organisationNode = node.get("organisation");
+			URI organisation = organisationNode != null ? new URI(organisationNode.get("value").asText()) : null;
+			JsonNode ownerLabelNode = node.get("ownerLabel");
+			String ownerLabel = ownerLabelNode != null ? ownerLabelNode.get("value").asText() : null;
+			JsonNode topicNode = node.get("topic");
+			URI topic = topicNode != null ? new URI(topicNode.get("value").asText()) : null;
+			JsonNode topicLabelNode = node.get("topicLabel");
+			String topicLabel = topicLabelNode != null ? topicLabelNode.get("value").asText() : null;
+			JsonNode contactNode = node.get("contact");
+			URI contact = contactNode != null ? new URI(contactNode.get("value").asText()) : null;
+			JsonNode contactLabelNode = node.get("contactLabel");
+			String contactLabel = contactLabelNode != null ? contactLabelNode.get("value").asText() : null;
+			JsonNode decimalSymbolNode = node.get("decimalSymbol");
+			URI decimalSymbol = decimalSymbolNode != null ? new URI(decimalSymbolNode.get("value").asText()) : null;
+			JsonNode separatorNode = node.get("separator");
+			URI separator = separatorNode != null ? new URI(separatorNode.get("value").asText()) : null;
+			JsonNode formatNode = node.get("format");
+			URI format = formatNode != null ? new URI(formatNode.get("value").asText()) : null;
+			JsonNode infraObjectNode = node.get("infraObject");
+			URI infraObjectUri = infraObjectNode != null ? new URI(infraObjectNode.get("value").asText()) : null;
+			JsonNode infraLabelNode = node.get("infraLabel");
+			String infraLabel = infraLabelNode != null ? infraLabelNode.get("value").asText() : null;
+			JsonNode roadNode = node.get("road");
+			String road = roadNode != null ? roadNode.get("value").asText() : null;
+			JsonNode wayNode = node.get("way");
+			String way = wayNode != null ? wayNode.get("value").asText() : null;
+			JsonNode laneNode = node.get("lane");
+			String lane = laneNode != null ? laneNode.get("value").asText() : null;
+			JsonNode startNode = node.get("start");
+			Double start = startNode != null ? Double.parseDouble(startNode.get("value").textValue().replace(',', '.'))
+					: null;
+			JsonNode endNode = node.get("end");
+			Double end = endNode != null ? Double.parseDouble(endNode.get("value").textValue().replace(',', '.'))
+					: null;
 			if (!datasetId.equals(lastDatasetId)) {
-				dataset = new Dataset(datasetId, datasetLabel, dataReference, decimalSymbol, separator, format, project,
-						projectLabel, organisation, ownerLabel, topic, topicLabel, contact, contactLabel);
+				dataset = new Dataset(datasetId, datasetLabel, dataReference, measurementStartDate, measurementEndDate,
+						decimalSymbol, separator, format, project, projectLabel, organisation, ownerLabel, topic,
+						topicLabel, contact, contactLabel);
 				infraObjects = new ArrayList<>();
 				lastDatasetId = datasetId;
 			}
@@ -180,19 +273,46 @@ public class DatasetService {
 			dataset.setMeasurementYears(measurementYears);
 			List<QuantityKindAndUnit> quantityKindAndUnits = getQuantityKindAndUnits(datasetId);
 			dataset.setQuantityKindAndUnits(quantityKindAndUnits);
-			InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
-			infraObjects.add(infraObject);
+			if (infraObjectUri != null) {
+				InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
+				infraObjects.add(infraObject);
+			}
 			dataset.setInfraObjects(infraObjects);
 		}
 		return dataset;
+	}
+
+	public Dataset createDataset() throws URISyntaxException, IOException {
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		String localName = "ID" + UUID.randomUUID().toString();
+		URI uri = new URI(METADATA + localName);
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
+		queryStr.setIri("uri", uri.toString());
+		queryStr.setLiteral("label", localName.substring(0, 6));
+		queryStr.setIri("format", "http://www.sparontologies.net/mediatype/text/csv");
+		queryStr.setIri("csvDecimalSymbol", META + "COMMA");
+		queryStr.setIri("csvSeparatorSymbol", META + "DOT");
+		queryStr.append("INSERT { ");
+		queryStr.append("  ?uri rdf:type meta:File . ");
+		queryStr.append("  ?uri rdfs:label ?label . ");
+		queryStr.append("  ?uri meta:csvDecimalSymbol ?csvDecimalSymbol . ");
+		queryStr.append("  ?uri meta:csvSeparatorSymbol ?csvSeparatorSymbol . ");
+		queryStr.append("  ?uri dce:format ?format . ");
+		queryStr.append("} WHERE {");
+		queryStr.append("}");
+		fuseki.update(queryStr);
+
+		return getDataset(localName);
 	}
 
 	private List<QuantityKindAndUnit> getQuantityKindAndUnits(String datasetUri)
 			throws IOException, URISyntaxException {
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
 		queryStr.setIri("dataset", datasetUri);
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
 		queryStr.append("SELECT  ?quantityUri ?label ?quantity ?unit ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?dataset rdf:type meta:File ;");
@@ -220,8 +340,8 @@ public class DatasetService {
 	private List<String> getMeasurementYears(String datasetUri) throws IOException {
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
 		queryStr.setIri("dataset", datasetUri);
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
 		queryStr.append("SELECT  ?year ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?dataset rdf:type meta:File ;");
@@ -255,18 +375,10 @@ public class DatasetService {
 		if (!storedDataset.getDatasetLabel().equals(updatedDataset.getDatasetLabel())) {
 			updateLabelOfDataset(updatedDataset);
 		}
-		if (!storedDataset.getProject().equals(updatedDataset.getProject())) {
-			updateProjectOfDataset(updatedDataset);
-		}
-		if (!storedDataset.getOrganisation().equals(updatedDataset.getOrganisation())) {
-			updateOrganisationOfDataset(updatedDataset);
-		}
-		if (!storedDataset.getContact().equals(updatedDataset.getContact())) {
-			updateContactOfDataset(updatedDataset);
-		}
-		if (!storedDataset.getTopic().equals(updatedDataset.getTopic())) {
-			updateTopicOfDataset(updatedDataset);
-		}
+		updateProjectOfDataset(storedDataset, updatedDataset);
+		updateOrganisationOfDataset(storedDataset, updatedDataset);
+		updateContactOfDataset(storedDataset, updatedDataset);
+		updateTopicOfDataset(storedDataset, updatedDataset);
 		if (!storedDataset.getDecimalSymbol().equals(updatedDataset.getDecimalSymbol())) {
 			updateDecimalSymbolOfDataset(updatedDataset);
 		}
@@ -276,9 +388,7 @@ public class DatasetService {
 		if (!storedDataset.getFormat().equals(updatedDataset.getFormat())) {
 			updateFormatOfDataset(updatedDataset);
 		}
-		if (!storedDataset.getDataReference().equals(updatedDataset.getDataReference())) {
-			updateDataReferenceOfDataset(updatedDataset);
-		}
+		updateDataReferenceOfDataset(storedDataset, updatedDataset);
 		updateMeasurementYears(storedDataset, updatedDataset);
 		updateQuantities(storedDataset, updatedDataset);
 		updateInfraObjects(storedDataset, updatedDataset);
@@ -304,20 +414,20 @@ public class DatasetService {
 
 		if (doUpdate) {
 			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-			queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-			queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setNsPrefix("metadata", METADATA);
 			queryStr.setIri("dataset", storedDataset.getDatasetUri());
 			queryStr.append("DELETE { ?dataset meta:measurementYear ?year . } ");
 			queryStr.append("WHERE {");
 			queryStr.append("  ?dataset rdf:type meta:File ;");
-			queryStr.append("    meta:measurementYear ?year .");
+			queryStr.append("  OPTIONAL { meta:measurementYear ?year . } ");
 			queryStr.append("}");
 			fuseki.update(queryStr);
 
 			for (String year : updatedDataset.getMeasurementYears()) {
 				queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-				queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-				queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+				queryStr.setNsPrefix("meta", META);
+				queryStr.setNsPrefix("metadata", METADATA);
 				queryStr.setIri("dataset", storedDataset.getDatasetUri());
 				queryStr.setLiteral("year", year);
 				queryStr.append("INSERT { ?dataset meta:measurementYear ?year . } ");
@@ -346,7 +456,7 @@ public class DatasetService {
 		}
 		if (doUpdate) {
 			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-			queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+			queryStr.setNsPrefix("meta", META);
 			queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
 			queryStr.setIri("dataset", storedDataset.getDatasetUri());
 			queryStr.append("DELETE { ?dataset meta:quantityKindAndUnit ?quantity . } ");
@@ -358,8 +468,8 @@ public class DatasetService {
 
 			for (QuantityKindAndUnit quantity : updatedDataset.getQuantityKindAndUnits()) {
 				queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-				queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-				queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
+				queryStr.setNsPrefix("meta", META);
+				queryStr.setNsPrefix("metadata", METADATA);
 				queryStr.setIri("dataset", storedDataset.getDatasetUri());
 				queryStr.setIri("quantity", quantity.getUri().toString());
 				queryStr.append("INSERT { ?dataset meta:quantityKindAndUnit ?quantity . } ");
@@ -369,8 +479,9 @@ public class DatasetService {
 			}
 		}
 	}
-	
-	private void updateInfraObjects(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+
+	private void updateInfraObjects(Dataset storedDataset, Dataset updatedDataset)
+			throws IOException, URISyntaxException {
 		boolean doUpdate = false;
 		for (InfraObject infraObject : storedDataset.getInfraObjects()) {
 			if (!updatedDataset.getInfraObjects().contains(infraObject)) {
@@ -388,10 +499,13 @@ public class DatasetService {
 		}
 		if (doUpdate) {
 			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-			queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-			queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-			queryStr.setIri("dataset", storedDataset.getDatasetUri());
-			queryStr.append("DELETE { ?dataset meta:relatedToInfraObject ?infra_object . } ");
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setNsPrefix("metadata", METADATA);
+			queryStr.setIri("dataset", updatedDataset.getDatasetUri());
+			queryStr.append("DELETE { ");
+			queryStr.append("  ?dataset meta:relatedToInfraObject ?infra_object . ");
+			queryStr.append("  ?infra_object ?pred ?value . ");
+			queryStr.append("}");
 			queryStr.append("WHERE {");
 			queryStr.append("  ?dataset rdf:type meta:File ;");
 			queryStr.append("    meta:relatedToInfraObject ?infra_object .");
@@ -400,11 +514,45 @@ public class DatasetService {
 
 			for (InfraObject infraObject : updatedDataset.getInfraObjects()) {
 				queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-				queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-				queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-				queryStr.setIri("dataset", storedDataset.getDatasetUri());
+				queryStr.setNsPrefix("meta", META);
+				queryStr.setNsPrefix("metadata", METADATA);
+				queryStr.setIri("dataset", updatedDataset.getDatasetUri());
 				queryStr.setIri("infra_object", infraObject.getUri().toString());
-				queryStr.append("INSERT { ?dataset meta:relatedToInfraObject ?infra_object . } ");
+				URI start = new URI(METADATA + "ID" + UUID.randomUUID().toString());
+				queryStr.setIri("start", start.toString());
+				queryStr.setLiteral("start_label", start.getFragment());
+				queryStr.setLiteral("start_hectometer", String.valueOf(infraObject.getStart()));
+				queryStr.setLiteral("start_lane", infraObject.getLane());
+				queryStr.setLiteral("start_road", infraObject.getRoad());
+				queryStr.setLiteral("start_way", infraObject.getWay());
+				URI end = new URI(METADATA + "ID" + UUID.randomUUID().toString());
+				queryStr.setIri("end", end.toString());
+				queryStr.setLiteral("end_label", end.getFragment());
+				queryStr.setLiteral("end_hectometer", String.valueOf(infraObject.getEnd()));
+				queryStr.setLiteral("end_lane", infraObject.getLane());
+				queryStr.setLiteral("end_road", infraObject.getRoad());
+				queryStr.setLiteral("end_way", infraObject.getWay());
+				queryStr.setLiteral("distance", 0);
+				queryStr.append("INSERT { ");
+				queryStr.append("  ?dataset meta:relatedToInfraObject ?infra_object . ");
+				queryStr.append("  ?infra_object rdf:type meta:RoadPart . ");
+				queryStr.append("  ?start rdf:type meta:RoadNetworkLocation ; ");
+				queryStr.append("    rdfs:label ?start_label ; ");
+				queryStr.append("    meta:distance ?distance ; ");
+				queryStr.append("    meta:hectometerPostReference ?start_hectometer ; ");
+				queryStr.append("    meta:laneReference ?start_lane ; ");
+				queryStr.append("    meta:roadReference ?start_road ; ");
+				queryStr.append("    meta:wayReference ?start_way . ");
+				queryStr.append("  ?end rdf:type meta:RoadNetworkLocation ; ");
+				queryStr.append("    rdfs:label ?end_label ; ");
+				queryStr.append("    meta:distance ?distance ; ");
+				queryStr.append("    meta:hectometerPostReference ?end_hectometer ; ");
+				queryStr.append("    meta:laneReference ?end_lane ; ");
+				queryStr.append("    meta:roadReference ?end_road ; ");
+				queryStr.append("    meta:wayReference ?end_way . ");
+				queryStr.append("  ?infra_object meta:startRoadNetworkLocation ?start . ");
+				queryStr.append("  ?infra_object meta:endRoadNetworkLocation ?end . ");
+				queryStr.append("}");
 				queryStr.append("WHERE {");
 				queryStr.append("}");
 				fuseki.update(queryStr);
@@ -424,74 +572,95 @@ public class DatasetService {
 		fuseki.update(queryStr);
 	}
 
-	private void updateProjectOfDataset(Dataset dataset) throws IOException {
-		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setIri("subject", dataset.getDatasetUri());
-		queryStr.setIri("new_project", dataset.getProject().toString());
-		queryStr.append("  DELETE { ?subject meta:forProject ?project } ");
-		queryStr.append("  INSERT { ?subject meta:forProject ?new_project } ");
-		queryStr.append("WHERE { ?subject meta:forProject ?project . ");
-		queryStr.append("}");
+	private void updateProjectOfDataset(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+		if ((storedDataset.getProject() != null && !storedDataset.getProject().equals(updatedDataset.getProject()))
+				|| (updatedDataset.getProject() != null
+						&& !updatedDataset.getProject().equals(storedDataset.getProject()))) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setIri("subject", updatedDataset.getDatasetUri());
+			queryStr.setIri("new_project", updatedDataset.getProject().toString());
+			queryStr.append("  DELETE { ?subject meta:forProject ?project } ");
+			queryStr.append("  INSERT { ?subject meta:forProject ?new_project } ");
+			queryStr.append("WHERE { OPTIONAL { ?subject meta:forProject ?project . } ");
+			queryStr.append("}");
 
-		fuseki.update(queryStr);
+			fuseki.update(queryStr);
+		}
 	}
 
-	private void updateDataReferenceOfDataset(Dataset dataset) throws IOException {
-		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setIri("subject", dataset.getDatasetUri());
-		queryStr.setIri("new_datareference", dataset.getDataReference().toString());
-		queryStr.append("  DELETE { ?subject meta:dataReference ?datareference } ");
-		queryStr.append("  INSERT { ?subject meta:dataReference ?new_datareference } ");
-		queryStr.append("WHERE { ?subject meta:dataReference ?datareference . ");
-		queryStr.append("}");
+	private void updateDataReferenceOfDataset(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+		if ((storedDataset.getDataReference() != null
+				&& !storedDataset.getDataReference().equals(updatedDataset.getDataReference()))
+				|| (updatedDataset.getDataReference() != null
+						&& !updatedDataset.getDataReference().equals(storedDataset.getDataReference()))) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setIri("subject", updatedDataset.getDatasetUri());
+			queryStr.setIri("new_datareference", updatedDataset.getDataReference().toString());
+			queryStr.append("  DELETE { ?subject meta:dataReference ?datareference } ");
+			queryStr.append("  INSERT { ?subject meta:dataReference ?new_datareference } ");
+			queryStr.append("WHERE { ?subject meta:dataReference ?datareference . ");
+			queryStr.append("}");
 
-		fuseki.update(queryStr);
+			fuseki.update(queryStr);
+		}
 	}
 
-	private void updateOrganisationOfDataset(Dataset dataset) throws IOException {
-		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setIri("subject", dataset.getDatasetUri());
-		queryStr.setIri("new_organisation", dataset.getOrganisation().toString());
-		queryStr.append("  DELETE { ?subject meta:hasOwner ?organisation } ");
-		queryStr.append("  INSERT { ?subject meta:hasOwner ?new_organisation } ");
-		queryStr.append("WHERE { ?subject meta:hasOwner ?organisation . ");
-		queryStr.append("}");
+	private void updateOrganisationOfDataset(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+		if ((storedDataset.getOrganisation() != null
+				&& !storedDataset.getOrganisation().equals(updatedDataset.getOrganisation()))
+				|| (updatedDataset.getOrganisation() != null
+						&& !updatedDataset.getOrganisation().equals(storedDataset.getOrganisation()))) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setIri("subject", updatedDataset.getDatasetUri());
+			queryStr.setIri("new_organisation", updatedDataset.getOrganisation().toString());
+			queryStr.append("  DELETE { ?subject meta:hasOwner ?organisation } ");
+			queryStr.append("  INSERT { ?subject meta:hasOwner ?new_organisation } ");
+			queryStr.append("WHERE { OPTIONAL { ?subject meta:hasOwner ?organisation . } ");
+			queryStr.append("}");
 
-		fuseki.update(queryStr);
+			fuseki.update(queryStr);
+		}
 	}
 
-	private void updateContactOfDataset(Dataset dataset) throws IOException {
-		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setIri("subject", dataset.getDatasetUri());
-		queryStr.setIri("new_contact", dataset.getContact().toString());
-		queryStr.append("  DELETE { ?subject meta:contactPerson ?contact } ");
-		queryStr.append("  INSERT { ?subject meta:contactPerson ?new_contact } ");
-		queryStr.append("WHERE { ?subject meta:contactPerson ?organisation . ");
-		queryStr.append("}");
+	private void updateContactOfDataset(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+		if ((storedDataset.getContact() != null && !storedDataset.getContact().equals(updatedDataset.getContact()))
+				|| (updatedDataset.getContact() != null
+						&& !updatedDataset.getContact().equals(storedDataset.getContact()))) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setIri("subject", updatedDataset.getDatasetUri());
+			queryStr.setIri("new_contact", updatedDataset.getContact().toString());
+			queryStr.append("  DELETE { ?subject meta:contactPerson ?contact } ");
+			queryStr.append("  INSERT { ?subject meta:contactPerson ?new_contact } ");
+			queryStr.append("WHERE { OPTIONAL { ?subject meta:contactPerson ?organisation . } ");
+			queryStr.append("}");
 
-		fuseki.update(queryStr);
+			fuseki.update(queryStr);
+		}
 	}
 
-	private void updateTopicOfDataset(Dataset dataset) throws IOException {
-		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setIri("subject", dataset.getDatasetUri());
-		queryStr.setIri("new_topic", dataset.getTopic().toString());
-		queryStr.append("  DELETE { ?subject meta:hasTopic ?topic } ");
-		queryStr.append("  INSERT { ?subject meta:hasTopic ?new_topic } ");
-		queryStr.append("WHERE { ?subject meta:hasTopic ?topic . ");
-		queryStr.append("}");
+	private void updateTopicOfDataset(Dataset storedDataset, Dataset updatedDataset) throws IOException {
+		if ((storedDataset.getTopic() != null && !storedDataset.getTopic().equals(updatedDataset.getTopic()))
+				|| (updatedDataset.getTopic() != null && !updatedDataset.getTopic().equals(storedDataset.getTopic()))) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setIri("subject", updatedDataset.getDatasetUri());
+			queryStr.setIri("new_topic", updatedDataset.getTopic().toString());
+			queryStr.append("  DELETE { ?subject meta:hasTopic ?topic } ");
+			queryStr.append("  INSERT { ?subject meta:hasTopic ?new_topic } ");
+			queryStr.append("WHERE { OPTIONAL { ?subject meta:hasTopic ?topic . } ");
+			queryStr.append("}");
 
-		fuseki.update(queryStr);
+			fuseki.update(queryStr);
+		}
 	}
 
 	private void updateDecimalSymbolOfDataset(Dataset dataset) throws IOException, URISyntaxException {
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+		queryStr.setNsPrefix("meta", META);
 		queryStr.setIri("subject", dataset.getDatasetUri());
 		queryStr.setIri("new_decimal_symbol", dataset.getDecimalSymbol().getUri().toString());
 		queryStr.append("  DELETE { ?subject meta:csvDecimalSymbol ?decimal_symbol } ");
@@ -504,7 +673,7 @@ public class DatasetService {
 
 	private void updateSeparatorOfDataset(Dataset dataset) throws IOException, URISyntaxException {
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+		queryStr.setNsPrefix("meta", META);
 		queryStr.setIri("subject", dataset.getDatasetUri());
 		queryStr.setIri("new_separator_symbol", dataset.getSeparator().getUri().toString());
 		queryStr.append("  DELETE { ?subject meta:csvSeparatorSymbol ?separator_symbol } ");
@@ -517,8 +686,8 @@ public class DatasetService {
 
 	private void updateFormatOfDataset(Dataset dataset) throws IOException, URISyntaxException {
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("dc", "http://purl.org/dc/elements/1.1/");
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
+		queryStr.setNsPrefix("dc", DCE);
+		queryStr.setNsPrefix("meta", META);
 		queryStr.setIri("subject", dataset.getDatasetUri());
 		queryStr.setIri("new_format", dataset.getSeparator().getUri().toString());
 		queryStr.append("  DELETE { ?subject dc:format ?format } ");
@@ -532,9 +701,9 @@ public class DatasetService {
 	public List<Project> getAllProjects() throws IOException, URISyntaxException {
 		List<Project> projects = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append("SELECT DISTINCT ?uri ?label ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?uri rdf:type meta:Project ;");
@@ -553,11 +722,11 @@ public class DatasetService {
 	}
 
 	public Project getProject(String localName) throws IOException, URISyntaxException {
-		URI uri = new URI("https://w3id.org/metadata#" + localName);
+		URI uri = new URI(METADATA + localName);
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("uri", uri.toString());
 		queryStr.append("SELECT DISTINCT ?uri ?label ");
 		queryStr.append("WHERE {");
@@ -576,9 +745,9 @@ public class DatasetService {
 	public List<Organisation> getAllOrganisations() throws IOException, URISyntaxException {
 		List<Organisation> organisations = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append("SELECT DISTINCT ?uri ?label ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?uri rdf:type meta:Organisation ;");
@@ -597,11 +766,11 @@ public class DatasetService {
 	}
 
 	public Organisation getOrganisation(String localName) throws IOException, URISyntaxException {
-		URI uri = new URI("https://w3id.org/metadata#" + localName);
+		URI uri = new URI(METADATA + localName);
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("uri", uri.toString());
 		queryStr.append("SELECT DISTINCT ?uri ?label ");
 		queryStr.append("WHERE {");
@@ -620,9 +789,9 @@ public class DatasetService {
 	public List<Person> getAllPersons() throws IOException, URISyntaxException {
 		List<Person> persons = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append("SELECT DISTINCT ?uri ?label ?email_address ?works_for ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?uri rdf:type meta:Person ;");
@@ -645,11 +814,11 @@ public class DatasetService {
 	}
 
 	public Person getPerson(String localName) throws IOException, URISyntaxException {
-		URI uri = new URI("https://w3id.org/metadata#" + localName);
+		URI uri = new URI(METADATA + localName);
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("uri", uri.toString());
 		queryStr.append("SELECT DISTINCT ?label ?email_address ?works_for ");
 		queryStr.append("WHERE {");
@@ -672,9 +841,9 @@ public class DatasetService {
 	public List<Topic> getAllTopics() throws IOException, URISyntaxException {
 		List<Topic> topics = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append("SELECT DISTINCT ?uri ?label ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?uri rdf:type meta:Topic ;");
@@ -693,11 +862,11 @@ public class DatasetService {
 	}
 
 	public Topic getTopic(String localName) throws IOException, URISyntaxException {
-		URI uri = new URI("https://w3id.org/meta#" + localName);
+		URI uri = new URI(META + localName);
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("uri", uri.toString());
 		queryStr.append("SELECT DISTINCT ?uri ?label ");
 		queryStr.append("WHERE {");
@@ -716,32 +885,44 @@ public class DatasetService {
 	public List<InfraObject> getAllInfraObjects() throws IOException, URISyntaxException {
 		List<InfraObject> infraObjects = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append("SELECT DISTINCT ?uri ?label ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
-		queryStr.append("  ?uri rdf:type meta:RoadPart ;");
-		queryStr.append("    rdfs:label ?label ;");
-		queryStr.append("    meta:endRoadNetworkLocation ?endLocation ;");
-		queryStr.append("    meta:startRoadNetworkLocation ?startLocation .");
-		queryStr.append("  ?endLocation meta:hectometerPostReference ?end ;");
-		queryStr.append("    meta:laneReference ?lane ;");
-		queryStr.append("    meta:roadReference ?road ;");
-		queryStr.append("    meta:wayReference ?way .");
-		queryStr.append("  ?startLocation meta:hectometerPostReference ?start .");
+		queryStr.append("  ?uri rdf:type meta:RoadPart .");
+		queryStr.append("  ?uri  rdfs:label ?label .");
+		queryStr.append("  OPTIONAL { ");
+		queryStr.append("    ?uri  meta:endRoadNetworkLocation ?endLocation .");
+		queryStr.append("    ?endLocation meta:hectometerPostReference ?end ;");
+		queryStr.append("      meta:laneReference ?lane ;");
+		queryStr.append("      meta:roadReference ?road ;");
+		queryStr.append("      meta:wayReference ?way .");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL { ");
+		queryStr.append("    ?uri  meta:startRoadNetworkLocation ?startLocation .");
+		queryStr.append("    ?startLocation meta:hectometerPostReference ?start .");
+		queryStr.append("  }");
 		queryStr.append("}");
 		queryStr.append("ORDER BY ?label");
 		JsonNode responseNodes = fuseki.query(queryStr);
 		InfraObject infraObject = null;
 		for (JsonNode node : responseNodes) {
 			URI uri = new URI(node.get("uri").get("value").asText());
-			String label = node.get("label").get("value").asText();
-			String road = node.get("road").get("value").asText();
-			String way = node.get("way").get("value").asText();
-			String lane = node.get("lane").get("value").asText();
-			Double start = Double.parseDouble(node.get("start").get("value").textValue().replace(',', '.'));
-			Double end = Double.parseDouble(node.get("end").get("value").textValue().replace(',', '.'));
+			JsonNode labelNode = node.get("label");
+			String label = labelNode != null ? labelNode.get("value").asText() : null;
+			JsonNode roadNode = node.get("road");
+			String road = roadNode != null ? roadNode.get("value").asText() : null;
+			JsonNode wayNode = node.get("way");
+			String way = wayNode != null ? wayNode.get("value").asText() : null;
+			JsonNode laneNode = node.get("lane");
+			String lane = laneNode != null ? laneNode.get("value").asText() : null;
+			JsonNode startNode = node.get("start");
+			Double start = startNode != null ? Double.parseDouble(startNode.get("value").textValue().replace(',', '.'))
+					: null;
+			JsonNode endNode = node.get("end");
+			Double end = endNode != null ? Double.parseDouble(endNode.get("value").textValue().replace(',', '.'))
+					: null;
 			infraObject = new InfraObject(uri, label, road, way, lane, start, end);
 			infraObjects.add(infraObject);
 		}
@@ -749,44 +930,75 @@ public class DatasetService {
 	}
 
 	public InfraObject getInfraObject(String localName) throws IOException, URISyntaxException {
-		URI uri = new URI("https://w3id.org/meta#" + localName);
+		URI uri = new URI(METADATA + localName);
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("uri", uri.toString());
 		queryStr.append("SELECT DISTINCT ?label ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
-		queryStr.append("  ?uri rdf:type meta:RoadPart ;");
-		queryStr.append("    rdfs:label ?label ;");
-		queryStr.append("    meta:endRoadNetworkLocation ?endLocation ;");
-		queryStr.append("    meta:startRoadNetworkLocation ?startLocation .");
-		queryStr.append("  ?endLocation meta:hectometerPostReference ?end ;");
-		queryStr.append("    meta:laneReference ?lane ;");
-		queryStr.append("    meta:roadReference ?road ;");
-		queryStr.append("    meta:wayReference ?way .");
-		queryStr.append("  ?startLocation meta:hectometerPostReference ?start .");
+		queryStr.append("  ?uri rdf:type meta:RoadPart .");
+		queryStr.append("  ?uri rdfs:label ?label .");
+		queryStr.append("  OPTIONAL { ");
+		queryStr.append("    ?uri  meta:endRoadNetworkLocation ?endLocation .");
+		queryStr.append("    ?endLocation meta:hectometerPostReference ?end ;");
+		queryStr.append("      meta:laneReference ?lane ;");
+		queryStr.append("      meta:roadReference ?road ;");
+		queryStr.append("      meta:wayReference ?way .");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL { ");
+		queryStr.append("    ?uri  meta:startRoadNetworkLocation ?startLocation .");
+		queryStr.append("    ?startLocation meta:hectometerPostReference ?start .");
+		queryStr.append("  }");
 		queryStr.append("}");
 		JsonNode responseNodes = fuseki.query(queryStr);
 		InfraObject infraObject = null;
 		for (JsonNode node : responseNodes) {
-			String label = node.get("label").get("value").asText();
-			String road = node.get("road").get("value").asText();
-			String way = node.get("way").get("value").asText();
-			String lane = node.get("lane").get("value").asText();
-			Double start = Double.parseDouble(node.get("start").get("value").textValue().replace(',', '.'));
-			Double end = Double.parseDouble(node.get("end").get("value").textValue().replace(',', '.'));
+			JsonNode labelNode = node.get("label");
+			String label = labelNode != null ? labelNode.get("value").asText() : null;
+			JsonNode roadNode = node.get("road");
+			String road = roadNode != null ? roadNode.get("value").asText() : null;
+			JsonNode wayNode = node.get("way");
+			String way = wayNode != null ? wayNode.get("value").asText() : null;
+			JsonNode laneNode = node.get("lane");
+			String lane = laneNode != null ? laneNode.get("value").asText() : null;
+			JsonNode startNode = node.get("start");
+			Double start = startNode != null ? Double.parseDouble(startNode.get("value").textValue().replace(',', '.'))
+					: null;
+			JsonNode endNode = node.get("end");
+			Double end = endNode != null ? Double.parseDouble(endNode.get("value").textValue().replace(',', '.'))
+					: null;
 			infraObject = new InfraObject(uri, label, road, way, lane, start, end);
 		}
 		return infraObject;
 	}
 
+	public InfraObject createInfraObject() throws URISyntaxException, IOException {
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		String localName = "ID" + UUID.randomUUID().toString();
+		URI uri = new URI(METADATA + localName);
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
+		queryStr.setIri("uri", uri.toString());
+		queryStr.setLiteral("label", localName.substring(0, 6));
+		queryStr.append("INSERT { ");
+		queryStr.append("  ?uri rdf:type meta:RoadPart . ");
+		queryStr.append("  ?uri rdfs:label ?label . ");
+		queryStr.append("} WHERE {");
+		queryStr.append("}");
+		fuseki.update(queryStr);
+
+		return getInfraObject(localName);
+	}
+
 	public List<QuantityKindAndUnit> getAllQuantities() throws IOException, URISyntaxException {
 		List<QuantityKindAndUnit> quantities = new ArrayList<>();
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append("SELECT  ?uri ?label ?quantity ?unit ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?uri rdf:type meta:QuantityKindAndUnit ;");
@@ -810,11 +1022,11 @@ public class DatasetService {
 	}
 
 	public QuantityKindAndUnit getQuantity(String localName) throws IOException, URISyntaxException {
-		URI uri = new URI("https://w3id.org/metadata#" + localName);
+		URI uri = new URI(METADATA + localName);
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", "https://w3id.org/meta#");
-		queryStr.setNsPrefix("metadata", "https://w3id.org/metadata#");
-		queryStr.setNsPrefix("dce", "http://purl.org/dc/elements/1.1/");
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("uri", uri.toString());
 		queryStr.append("SELECT  ?label ?quantity ?unit ");
 		queryStr.append("WHERE {");

@@ -2,6 +2,7 @@ package nl.tno.willemsph.infra.dataset;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.List;
 
 public class Dataset {
@@ -92,6 +93,8 @@ public class Dataset {
 	private Format format;
 	private URI organisation;
 	private String ownerLabel;
+	private Date measurementEndDate;
+	private Date measurementStartDate;
 	private List<String> measurementYears;
 	private List<QuantityKindAndUnit> quantityKindAndUnits;
 	private URI topic;
@@ -100,12 +103,14 @@ public class Dataset {
 	public Dataset() {
 	}
 
-	public Dataset(String datasetUri, String datasetLabel, URI dataReference, URI decimalSymbol, URI separator,
-			URI format, URI project, String projectLabel, URI organisation, String ownerLabel, URI topic,
-			String topicLabel, URI contact, String contactLabel) {
+	public Dataset(String datasetUri, String datasetLabel, URI dataReference, Date measurementStartDate,
+			Date measurementEndDate, URI decimalSymbol, URI separator, URI format, URI project, String projectLabel,
+			URI organisation, String ownerLabel, URI topic, String topicLabel, URI contact, String contactLabel) {
 		this.datasetUri = datasetUri;
 		this.datasetLabel = datasetLabel;
 		this.dataReference = dataReference;
+		this.measurementStartDate = measurementStartDate;
+		this.measurementEndDate = measurementEndDate;
 		this.project = project;
 		this.projectLabel = projectLabel;
 		this.organisation = organisation;
@@ -213,6 +218,22 @@ public class Dataset {
 
 	public void setOwnerLabel(String ownerLabel) {
 		this.ownerLabel = ownerLabel;
+	}
+
+	public Date getMeasurementEndDate() {
+		return measurementEndDate;
+	}
+
+	public void setMeasurementEndDate(Date measurementEndDate) {
+		this.measurementEndDate = measurementEndDate;
+	}
+
+	public Date getMeasurementStartDate() {
+		return measurementStartDate;
+	}
+
+	public void setMeasurementStartDate(Date measurementStartDate) {
+		this.measurementStartDate = measurementStartDate;
 	}
 
 	public List<String> getMeasurementYears() {

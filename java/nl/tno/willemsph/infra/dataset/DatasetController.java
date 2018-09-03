@@ -23,6 +23,12 @@ public class DatasetController {
 	public List<Dataset> getAllDatasets() throws IOException, URISyntaxException {
 		return datasetService.getAllDatasets();
 	}
+	
+	@CrossOrigin
+	@RequestMapping(method = RequestMethod.POST, value = "/datasets")
+	public Dataset createDataset() throws IOException, URISyntaxException {
+		return datasetService.createDataset();
+	}
 
 	@CrossOrigin
 	@RequestMapping("/datasets/{localName}")
@@ -79,6 +85,12 @@ public class DatasetController {
 		return datasetService.getAllInfraObjects();
 	}
 
+	@CrossOrigin
+	@RequestMapping(method = RequestMethod.POST, value = "/infra-objects")
+	public InfraObject createInfraObject() throws IOException, URISyntaxException {
+		return datasetService.createInfraObject();
+	}
+	
 	@CrossOrigin
 	@RequestMapping("/infra-objects/{localName}")
 	public InfraObject getInfraObject(@PathVariable String localName) throws IOException, URISyntaxException {
