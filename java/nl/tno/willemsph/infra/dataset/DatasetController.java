@@ -23,7 +23,7 @@ public class DatasetController {
 	public List<Dataset> getAllDatasets() throws IOException, URISyntaxException {
 		return datasetService.getAllDatasets();
 	}
-	
+
 	@CrossOrigin
 	@RequestMapping(method = RequestMethod.POST, value = "/datasets")
 	public Dataset createDataset() throws IOException, URISyntaxException {
@@ -41,6 +41,12 @@ public class DatasetController {
 	public Dataset updateDataset(@PathVariable String localName, @RequestBody Dataset dataset)
 			throws URISyntaxException, IOException {
 		return datasetService.updateDataset(localName, dataset);
+	}
+
+	@CrossOrigin
+	@RequestMapping(method = RequestMethod.POST, value = "/datasets/query")
+	public List<Dataset> queryDatasets(@RequestBody DatasetQuery query) throws IOException, URISyntaxException {
+		return datasetService.queryDatasets(query);
 	}
 
 	@CrossOrigin
@@ -78,7 +84,7 @@ public class DatasetController {
 	public Topic getTopic(@PathVariable String localName) throws IOException, URISyntaxException {
 		return datasetService.getTopic(localName);
 	}
-	
+
 	@CrossOrigin
 	@RequestMapping("/infra-objects")
 	public List<InfraObject> getAllInfraObjects() throws IOException, URISyntaxException {
@@ -90,7 +96,7 @@ public class DatasetController {
 	public InfraObject createInfraObject() throws IOException, URISyntaxException {
 		return datasetService.createInfraObject();
 	}
-	
+
 	@CrossOrigin
 	@RequestMapping("/infra-objects/{localName}")
 	public InfraObject getInfraObject(@PathVariable String localName) throws IOException, URISyntaxException {
@@ -108,7 +114,7 @@ public class DatasetController {
 	public QuantityKindAndUnit getQuantity(@PathVariable String localName) throws IOException, URISyntaxException {
 		return datasetService.getQuantity(localName);
 	}
-	
+
 	@CrossOrigin
 	@RequestMapping("/persons")
 	public List<Person> getAllPersons() throws IOException, URISyntaxException {

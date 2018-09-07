@@ -9,7 +9,9 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.bind.DatatypeConverter;
@@ -22,6 +24,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.jena.ext.com.google.common.collect.Lists;
 import org.apache.jena.query.ParameterizedSparqlString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +32,8 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.tno.willemsph.infra.SparqlService;
+import nl.tno.willemsph.infra.roadsection.RoadSection;
+import nl.tno.willemsph.infra.roadsection.RoadSectionService;
 
 @Service
 public class DatasetService {
@@ -38,6 +43,9 @@ public class DatasetService {
 
 	@Autowired
 	private SparqlService fuseki;
+
+	@Autowired
+	private RoadSectionService roadSectionService;
 
 	public List<Dataset> getAllDatasets() throws IOException, URISyntaxException {
 		List<Dataset> datasets = new ArrayList<>();
@@ -1058,6 +1066,59 @@ public class DatasetService {
 
 	public List<Dataset.Format> getAllFormats() throws IOException, URISyntaxException {
 		return Arrays.asList(Dataset.Format.values());
+	}
+
+	public List<Dataset> queryDatasets(DatasetQuery query) throws IOException, URISyntaxException {
+		Map<String, Dataset> datasetMap = new HashMap<>();
+		List<Long> roadSectionIds = query.getRoadSectionIds();
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		queryStr.setNsPrefix("meta", META);
+		queryStr.setNsPrefix("metadata", METADATA);
+		queryStr.setNsPrefix("dce", DCE);
+		queryStr.setLiteral("roadReference", query.getRoadNumber());
+		for (int index = 0; index < roadSectionIds.size(); index++) {
+			Long roadSectionId = roadSectionIds.get(index);
+			queryStr.setLiteral("roadSectionId", roadSectionIds.get(index));
+			RoadSection roadSection = roadSectionService.getRoadSection(roadSectionId);
+			Double beginKilometer = roadSection.getBeginKilometer();
+			Double endKilometer = roadSection.getEndKilometer();
+			queryStr.setLiteral("beginKilometer", beginKilometer);
+			queryStr.setLiteral("endKilometer", endKilometer);
+			queryStr.append("SELECT  ?dataset ?roadPart ?hectometerStartPostValue ?hectometerEndPostValue ");
+			queryStr.append("WHERE {");
+			queryStr.append("?dataset meta:relatedToInfraObject ?roadPart .");
+			queryStr.append("?roadPart meta:startRoadNetworkLocation ?roadStartNetworkLocation . ");
+			queryStr.append("?roadPart meta:endRoadNetworkLocation ?roadEndNetworkLocation . ");
+			queryStr.append("?roadStartNetworkLocation meta:roadReference ?roadReference ; ");
+			queryStr.append("meta:hectometerPostValue ?hectometerStartPostValue . ");
+			queryStr.append("?roadEndNetworkLocation meta:roadReference ?roadReference ; ");
+			queryStr.append("meta:hectometerPostValue ?hectometerEndPostValue . ");
+			queryStr.append("FILTER ( ( ( ?hectometerStartPostValue < ?hectometerEndPostValue ) && ");
+			queryStr.append(
+					"( ?hectometerStartPostValue < ?beginKilometer ) && ( ?hectometerEndPostValue > ?endKilometer ) ) ");
+			queryStr.append("||  ( ( ?hectometerStartPostValue > ?hectometerEndPostValue ) &&  ");
+			queryStr.append(
+					"( ?hectometerStartPostValue < ?beginKilometer) && ( ?hectometerEndPostValue > ?endKilometer ) ) ) ");
+			queryStr.append("}");
+			JsonNode responseNodes = fuseki.query(queryStr);
+			for (int i = 0; i < responseNodes.size(); i++) {
+				JsonNode jsonNode = responseNodes.get(i);
+				JsonNode datasetNode = jsonNode.get("dataset");
+				if (datasetNode != null) {
+					System.out.println(datasetNode.get("value").textValue());
+					URI uri = new URI(datasetNode.get("value").textValue());
+					if (datasetMap.get(uri.getFragment()) == null) {
+						Dataset dataset = getDataset(uri.getFragment());
+						datasetMap.put(uri.getFragment(), dataset);
+					}
+				}
+				JsonNode roadPartNode = jsonNode.get("roadPart");
+				if (roadPartNode != null) {
+					System.out.println(roadPartNode.get("value").toString());
+				}
+			}
+		}
+		return Lists.newArrayList(datasetMap.values().iterator());
 	}
 
 }
