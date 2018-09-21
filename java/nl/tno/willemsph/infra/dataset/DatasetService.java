@@ -8,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1071,34 +1072,131 @@ public class DatasetService {
 	public List<Dataset> queryDatasets(DatasetQuery query) throws IOException, URISyntaxException {
 		Map<String, Dataset> datasetMap = new HashMap<>();
 		List<Long> roadSectionIds = query.getRoadSectionIds();
-		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
-		queryStr.setNsPrefix("meta", META);
-		queryStr.setNsPrefix("metadata", METADATA);
-		queryStr.setNsPrefix("dce", DCE);
-		queryStr.setLiteral("roadReference", query.getRoadNumber());
-		for (int index = 0; index < roadSectionIds.size(); index++) {
-			Long roadSectionId = roadSectionIds.get(index);
-			queryStr.setLiteral("roadSectionId", roadSectionIds.get(index));
-			RoadSection roadSection = roadSectionService.getRoadSection(roadSectionId);
-			Double beginKilometer = roadSection.getBeginKilometer();
-			Double endKilometer = roadSection.getEndKilometer();
-			queryStr.setLiteral("beginKilometer", beginKilometer);
-			queryStr.setLiteral("endKilometer", endKilometer);
-			queryStr.append("SELECT  ?dataset ?roadPart ?hectometerStartPostValue ?hectometerEndPostValue ");
+		Long reqStartDate = query.getStartDate();
+		Long reqEndDate = query.getEndDate();
+		List<String> reqTopics = query.getTopics();
+		if (roadSectionIds != null) {
+			for (int index = 0; index < roadSectionIds.size(); index++) {
+				ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+				queryStr.setNsPrefix("meta", META);
+				queryStr.setNsPrefix("metadata", METADATA);
+				queryStr.setNsPrefix("dce", DCE);
+				queryStr.setLiteral("roadReference", query.getRoadNumber());
+				Long roadSectionId = roadSectionIds.get(index);
+				queryStr.setLiteral("roadSectionId", roadSectionIds.get(index));
+				RoadSection roadSection = roadSectionService.getRoadSection(roadSectionId);
+				String drivewayPositionCode = roadSection.getDrivewayPosition().getDrivewayPositionCode();
+				queryStr.setLiteral("drivewayPosition", drivewayPositionCode);
+				Double beginKilometer = roadSection.getBeginKilometer();
+				Double endKilometer = roadSection.getEndKilometer();
+				queryStr.setLiteral("beginKilometer", beginKilometer);
+				queryStr.setLiteral("endKilometer", endKilometer);
+				queryStr.append("SELECT  ?dataset ?roadPart ?hectometerStartPostValue ?hectometerEndPostValue ");
+				queryStr.append("WHERE {");
+				queryStr.append("?dataset meta:relatedToInfraObject ?roadPart .");
+				if (reqTopics != null && !reqTopics.isEmpty()) {
+					String reqTopic = reqTopics.get(0);
+					queryStr.setIri("reqTopic", reqTopic);
+					queryStr.append("	?dataset meta:hasTopic ?reqTopic . ");
+				}
+				if (reqStartDate != null) {
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTimeInMillis(reqStartDate);
+					queryStr.setLiteral("reqStartDate", calendar);
+					queryStr.append("?dataset meta:measurementStartDate ?startDate . ");
+					queryStr.append("FILTER ( xsd:dateTime(?startDate) > xsd:dateTime(?reqStartDate) )  ");
+				}
+				if (reqEndDate != null) {
+					Calendar calendar = Calendar.getInstance();
+					calendar.setTimeInMillis(reqEndDate);
+					queryStr.setLiteral("reqEndDate", calendar);
+					queryStr.append("?dataset meta:measurementEndDate ?endDate . ");
+					queryStr.append("FILTER ( xsd:dateTime(?endDate) < ?reqEndDate ) ");
+				}
+				queryStr.append("?roadPart meta:startRoadNetworkLocation ?roadStartNetworkLocation . ");
+				queryStr.append("?roadPart meta:endRoadNetworkLocation ?roadEndNetworkLocation . ");
+				queryStr.append("?roadStartNetworkLocation meta:roadReference ?roadReference ; ");
+				queryStr.append("    meta:wayReference ?wayReference ;");
+				queryStr.append("    meta:hectometerPostValue ?hectometerStartPostValue . ");
+				queryStr.append("?roadEndNetworkLocation meta:roadReference ?roadReference ; ");
+				queryStr.append("    meta:wayReference ?wayReference ;");
+				queryStr.append("    meta:hectometerPostValue ?hectometerEndPostValue . ");
+				queryStr.append("FILTER ( ");
+				queryStr.append("   STRENDS( ?wayReference, ?drivewayPosition ) && ( ");
+				queryStr.append("	  (( ?hectometerStartPostValue < ?hectometerEndPostValue ) && ");
+				queryStr.append(
+						"		(( ?beginKilometer > ?hectometerStartPostValue ) && ( ?beginKilometer < ?hectometerEndPostValue ) || ");
+				queryStr.append(
+						"		(( ?endKilometer > ?hectometerStartPostValue ) && ( ?endKilometer < ?hectometerEndPostValue )))) ");
+				queryStr.append("	|| ");
+				queryStr.append("	  (( ?hectometerStartPostValue > ?hectometerEndPostValue ) && ");
+				queryStr.append(
+						"		(( ?beginKilometer > ?hectometerEndPostValue ) && ( ?beginKilometer < ?hectometerStartPostValue ) || ");
+				queryStr.append(
+						"		(( ?endKilometer > ?hectometerEndPostValue ) && ( ?endKilometer < ?hectometerStartPostValue )))) ");
+				queryStr.append("	|| ");
+				queryStr.append("	  (( ?beginKilometer < ?endKilometer ) && ");
+				queryStr.append(
+						"		(( ?hectometerStartPostValue > ?beginKilometer ) && ( ?hectometerStartPostValue < ?endKilometer ) || ");
+				queryStr.append(
+						"		(( ?hectometerEndPostValue > ?beginKilometer ) && ( ?hectometerEndPostValue < ?endKilometer  )))) ");
+				queryStr.append("	|| ");
+				queryStr.append("	  (( ?beginKilometer > ?endKilometer ) && ");
+				queryStr.append(
+						"		(( ?hectometerStartPostValue > ?endKilometer ) && ( ?hectometerStartPostValue < ?beginKilometer ) || ");
+				queryStr.append(
+						"		(( ?hectometerEndPostValue > ?endKilometer ) && ( ?hectometerEndPostValue < ?beginKilometer )))) ");
+				queryStr.append("	 ) ");
+				queryStr.append(") ");
+				queryStr.append("}");
+				JsonNode responseNodes = fuseki.query(queryStr);
+				for (int i = 0; i < responseNodes.size(); i++) {
+					JsonNode jsonNode = responseNodes.get(i);
+					JsonNode datasetNode = jsonNode.get("dataset");
+					if (datasetNode != null) {
+						System.out.println(datasetNode.get("value").textValue());
+						URI uri = new URI(datasetNode.get("value").textValue());
+						if (datasetMap.get(uri.getFragment()) == null) {
+							Dataset dataset = getDataset(uri.getFragment());
+							datasetMap.put(uri.getFragment(), dataset);
+						}
+					}
+					JsonNode roadPartNode = jsonNode.get("roadPart");
+					if (roadPartNode != null) {
+						System.out.println(roadPartNode.get("value").toString());
+					}
+				}
+			}
+		} else if (reqStartDate != null || reqEndDate != null) {
+			ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+			queryStr.setNsPrefix("meta", META);
+			queryStr.setNsPrefix("metadata", METADATA);
+			queryStr.setNsPrefix("dce", DCE);
+			if (reqStartDate != null) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTimeInMillis(reqStartDate);
+				queryStr.setLiteral("reqStartDate", calendar);
+			}
+			if (reqEndDate != null) {
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTimeInMillis(reqEndDate);
+				queryStr.setLiteral("reqEndDate", calendar);
+			}
+			queryStr.append("SELECT ?dataset ?startDate ?endDate ");
 			queryStr.append("WHERE {");
-			queryStr.append("?dataset meta:relatedToInfraObject ?roadPart .");
-			queryStr.append("?roadPart meta:startRoadNetworkLocation ?roadStartNetworkLocation . ");
-			queryStr.append("?roadPart meta:endRoadNetworkLocation ?roadEndNetworkLocation . ");
-			queryStr.append("?roadStartNetworkLocation meta:roadReference ?roadReference ; ");
-			queryStr.append("meta:hectometerPostValue ?hectometerStartPostValue . ");
-			queryStr.append("?roadEndNetworkLocation meta:roadReference ?roadReference ; ");
-			queryStr.append("meta:hectometerPostValue ?hectometerEndPostValue . ");
-			queryStr.append("FILTER ( ( ( ?hectometerStartPostValue < ?hectometerEndPostValue ) && ");
-			queryStr.append(
-					"( ?hectometerStartPostValue < ?beginKilometer ) && ( ?hectometerEndPostValue > ?endKilometer ) ) ");
-			queryStr.append("||  ( ( ?hectometerStartPostValue > ?hectometerEndPostValue ) &&  ");
-			queryStr.append(
-					"( ?hectometerStartPostValue < ?beginKilometer) && ( ?hectometerEndPostValue > ?endKilometer ) ) ) ");
+			if (reqStartDate != null) {
+				queryStr.append("?dataset meta:measurementStartDate ?startDate . ");
+				queryStr.append("FILTER ( xsd:dateTime(?startDate) > xsd:dateTime(?reqStartDate) )  ");
+			}
+			if (reqEndDate != null) {
+				queryStr.append("?dataset meta:measurementEndDate ?endDate . ");
+				queryStr.append("FILTER ( xsd:dateTime(?endDate) < ?reqEndDate ) ");
+			}
+			if (reqTopics != null && !reqTopics.isEmpty()) {
+				String reqTopic = reqTopics.get(0);
+				queryStr.setIri("reqTopic", reqTopic);
+				queryStr.append("	?dataset meta:hasTopic ?reqTopic . ");
+			}
 			queryStr.append("}");
 			JsonNode responseNodes = fuseki.query(queryStr);
 			for (int i = 0; i < responseNodes.size(); i++) {
@@ -1112,9 +1210,31 @@ public class DatasetService {
 						datasetMap.put(uri.getFragment(), dataset);
 					}
 				}
-				JsonNode roadPartNode = jsonNode.get("roadPart");
-				if (roadPartNode != null) {
-					System.out.println(roadPartNode.get("value").toString());
+			}
+		} else if (reqTopics != null) {
+			for (int index = 0; index < reqTopics.size(); index++) {
+				ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+				queryStr.setNsPrefix("meta", META);
+				queryStr.setNsPrefix("metadata", METADATA);
+				queryStr.setNsPrefix("dce", DCE);
+				String reqTopic = reqTopics.get(index);
+				queryStr.setIri("reqTopic", reqTopic);
+				queryStr.append("SELECT  ?dataset ?topicLabel ");
+				queryStr.append("WHERE {");
+				queryStr.append("	?dataset meta:hasTopic ?reqTopic . ");
+				queryStr.append("}");
+				JsonNode responseNodes = fuseki.query(queryStr);
+				for (int i = 0; i < responseNodes.size(); i++) {
+					JsonNode jsonNode = responseNodes.get(i);
+					JsonNode datasetNode = jsonNode.get("dataset");
+					if (datasetNode != null) {
+						System.out.println(datasetNode.get("value").textValue());
+						URI uri = new URI(datasetNode.get("value").textValue());
+						if (datasetMap.get(uri.getFragment()) == null) {
+							Dataset dataset = getDataset(uri.getFragment());
+							datasetMap.put(uri.getFragment(), dataset);
+						}
+					}
 				}
 			}
 		}

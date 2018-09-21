@@ -106,6 +106,7 @@ public class SparqlService {
 			prefixMapping.setNsPrefix("rdfs", RDFS.uri);
 			prefixMapping.setNsPrefix("owl", OWL.NS);
 			prefixMapping.setNsPrefix("xml", "http://www.w3.org/XML/1998/namespace/");
+			prefixMapping.setNsPrefix("xsd","http://www.w3.org/2001/XMLSchema#");
 			prefixMapping.setNsPrefix("nwb", HOOFDWEGENNET_NS);
 			prefixMapping.setNsPrefix("list", LIST_NS);
 		}
