@@ -73,5 +73,14 @@ public class RoadSectionController {
 	public List<DrivewaySubtype> getDrivewaySubtypes() throws IOException {
 		return roadSectionService.getDrivewaySubtypes();
 	}
+	
+	@CrossOrigin
+	@RequestMapping("/civilstructures")
+	public List<CivilStructure> getAllCivilStructures(@RequestParam("road") Optional<String> roadId,
+			@RequestParam("direction") Optional<Boolean> direction,
+			@RequestParam("beginKilometer") Optional<Double> beginKilometer,
+			@RequestParam("endKilometer") Optional<Double> endKilometer) throws IOException {
+		return roadSectionService.getAllCivilStructures(roadId, direction, beginKilometer, endKilometer);
+	}
 
 }

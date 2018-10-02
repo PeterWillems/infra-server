@@ -272,6 +272,68 @@ public class RoadSectionService {
 		geometry.setMultiLineString(multiLineStrings);
 		return geometry;
 	}
+	
+	public Geometry getCivilStructureGeometry(String uri) throws IOException {
+		Geometry geometry = null;
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		queryStr.setIri("civilstructure", uri);
+		queryStr.append("SELECT ?graph ?x ?y ?lat ?lng ");
+		queryStr.append("{");
+		queryStr.append("  GRAPH ?graph { ");
+		queryStr.append("    ?civilstructure rdf:type nwb:Civilstructure ; ");
+		queryStr.append("      ( nwb:geometry | list:hasNext )+ ?geometrie . ");
+		queryStr.append("    ?geometrie list:hasContents  ?coordinate . ");
+		queryStr.append("    ?coordinate nwb:lat ?lat ; ");
+		queryStr.append("      nwb:lng ?lng ; ");
+		queryStr.append("      nwb:x ?x ; ");
+		queryStr.append("      nwb:y ?y . ");
+		queryStr.append("  } ");
+		queryStr.append("}");
+		JsonNode responseNodes = fuseki.query(queryStr);
+
+		geometry = new Geometry();
+		List<MultiLineString> multiLineStrings = new ArrayList<>();
+		for (JsonNode node : responseNodes) {
+			Coordinate coordinate = new Coordinate(node.get("lat").get("value").asDouble(),
+					node.get("lng").get("value").asDouble(), node.get("x").get("value").asDouble(),
+					node.get("y").get("value").asDouble());
+			MultiLineString multiLineString = new MultiLineString(coordinate);
+			multiLineStrings.add(multiLineString);
+		}
+		geometry.setMultiLineString(multiLineStrings);
+		return geometry;
+	}
+	
+	public Geometry getCivilStructureGeometryForRoad(String uri, String road) throws IOException {
+		Geometry geometry = null;
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		queryStr.setIri("civilstructure", uri);
+		queryStr.append("SELECT DISTINCT ?x ?y ?lat ?lng ");
+		queryStr.append("{");
+		queryStr.append("  GRAPH <" + SparqlService.HOOFDWEGENNET_DATA + "/R" + road + "> { ");
+		queryStr.append("  ?civilstructure rdf:type nwb:CivilStructure ;");
+		queryStr.append("    ( nwb:SHAPE | list:hasNext )+ ?geometrie .");
+		queryStr.append("  ?geometrie list:hasContents  ?coordinate .");
+		queryStr.append("  ?coordinate nwb:lat ?lat ;");
+		queryStr.append("    nwb:lng ?lng ;");
+		queryStr.append("    nwb:x ?x ;");
+		queryStr.append("    nwb:y ?y .");
+		queryStr.append("  } ");
+		queryStr.append("}");
+		JsonNode responseNodes = fuseki.query(queryStr);
+
+		geometry = new Geometry();
+		List<MultiLineString> multiLineStrings = new ArrayList<>();
+		for (JsonNode node : responseNodes) {
+			Coordinate coordinate = new Coordinate(node.get("lat").get("value").asDouble(),
+					node.get("lng").get("value").asDouble(), node.get("x").get("value").asDouble(),
+					node.get("y").get("value").asDouble());
+			MultiLineString multiLineString = new MultiLineString(coordinate);
+			multiLineStrings.add(multiLineString);
+		}
+		geometry.setMultiLineString(multiLineStrings);
+		return geometry;
+	}
 
 	private void getProperty(Long roadSectionId, Optional<String> roadId, String propertyUri, String value,
 			RoadSection roadSection) throws IOException {
@@ -362,6 +424,63 @@ public class RoadSectionService {
 			roadSection.setStreetName(value);
 			break;
 		}
+	}
+
+	private void getProperty(String civilStructureId, Optional<String> roadId, String propertyUri, String value,
+			CivilStructure civilStructure) throws IOException {
+		int indexOfHashMark = propertyUri.indexOf('#');
+		switch (propertyUri.substring(indexOfHashMark)) {
+		case "#BEGINKM":
+			civilStructure.setBeginKm(Double.parseDouble(value));
+			break;
+		case "#BEGINWDL":
+			civilStructure.setBeginWdl(value);
+			break;
+		case "#DOORRIJHGT":
+			civilStructure.setDoorrijhgt(Double.parseDouble(value));
+			break;
+		case "#EINDKM":
+			civilStructure.setEindKm(Double.parseDouble(value));
+			break;
+		case "#EINDWDL":
+			civilStructure.setEindWdl(value);
+			break;
+		case "#FK_VELD4":
+			civilStructure.setFkVeld4(value);
+			break;
+		case "#IBN":
+			civilStructure.setIbn(value);
+			break;
+		case "#INVENT_OMS":
+			civilStructure.setInventOms(value);
+			break;
+		case "#IZI_SIDE":
+			civilStructure.setIziSide(value);
+			break;
+		case "#KANTCODE":
+			civilStructure.setKantCode(value);
+			break;
+		case "#OBJECTID":
+			civilStructure.setObjectId(Integer.parseInt(value));
+			break;
+		case "#OMSCHR":
+			civilStructure.setOmschr(value);
+			break;
+		case "#WEGNUMMER":
+			civilStructure.setWegnummer(value);
+			break;
+		case "#SHAPE":
+			if (roadId != null && roadId.isPresent()) {
+				Geometry civilStructureGeometry = getCivilStructureGeometryForRoad(civilStructureId, roadId.get());
+				civilStructure.setGeometry(civilStructureGeometry);
+			} else {
+				Geometry civilStructureGeometry = getCivilStructureGeometry(civilStructureId);
+				civilStructure.setGeometry(civilStructureGeometry);
+			}
+			break;
+
+		}
+
 	}
 
 	private Map<URI, DrivewayPosition> getDrivewayPositions() throws IOException {
@@ -541,6 +660,68 @@ public class RoadSectionService {
 			properties.add(roadSectionProperty);
 		}
 		return properties;
+	}
+
+	public List<CivilStructure> getAllCivilStructures(Optional<String> roadId, Optional<Boolean> direction,
+			Optional<Double> beginKilometer, Optional<Double> endKilometer) throws IOException {
+		List<CivilStructure> civilStructures = new ArrayList<>();
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		if (roadId.isPresent()) {
+			queryStr.setIri("graph", SparqlService.HOOFDWEGENNET_DATA + "/R" + roadId.get());
+		}
+		queryStr.append("SELECT ?civilStructure ?kiwProperty ?propertyValue ");
+		queryStr.append("{");
+		queryStr.append("  GRAPH ?graph { ");
+		queryStr.append("  ?civilStructure rdf:type nwb:CivilStructure ;");
+		queryStr.append("	?kiwProperty ?propertyValue ");
+		if (roadId.isPresent()) {
+			queryStr.setLiteral("roadNumber", roadId.get());
+			queryStr.append(";  nwb:WEGNUMMER ?roadNumber ");
+		}
+//		if (direction.isPresent()) {
+//			if (direction.get()) {
+//				queryStr.append(";  nwb:KANTCODE 'R' ");
+//			} else {
+//				queryStr.append(";  nwb:KANTCODE 'L' ");
+//			}
+//		}
+		if (beginKilometer.isPresent() || endKilometer.isPresent()) {
+			queryStr.append(";  nwb:BEGINKM ?beginKilometer ");
+			queryStr.append(";  nwb:EINDKM ?endKilometer ");
+			queryStr.append("FILTER (");
+			if (beginKilometer.isPresent()) {
+				queryStr.append("((?beginKilometer < " + beginKilometer.get() + ") && (?endKilometer > "
+						+ beginKilometer.get() + "))");
+			}
+			if (beginKilometer.isPresent() && endKilometer.isPresent()) {
+				queryStr.append(" || ((?beginKilometer > " + beginKilometer.get() + ") && (?endKilometer < "
+						+ endKilometer.get() + ")) || ");
+			}
+			if (endKilometer.isPresent()) {
+				queryStr.append("((?beginKilometer < " + endKilometer.get() + ") && (?endKilometer > "
+						+ endKilometer.get() + "))");
+			}
+			queryStr.append(")");
+		}
+		queryStr.append(". ");
+		queryStr.append(" }");
+		queryStr.append("} ");
+		queryStr.append("ORDER BY ?civilStructure");
+
+		JsonNode responseNodes = fuseki.query(queryStr);
+		String currentRoadSectionId = null;
+		CivilStructure currentCivilStructure = null;
+		for (JsonNode node : responseNodes) {
+			String civilStructureUri = node.get("civilStructure").get("value").asText();
+			if (!civilStructureUri.equals(currentRoadSectionId)) {
+				currentRoadSectionId = civilStructureUri;
+				currentCivilStructure = new CivilStructure(currentRoadSectionId);
+				civilStructures.add(currentCivilStructure);
+			}
+			getProperty(civilStructureUri, roadId, node.get("kiwProperty").get("value").asText(),
+					node.get("propertyValue").get("value").asText(), currentCivilStructure);
+		}
+		return civilStructures;
 	}
 
 }

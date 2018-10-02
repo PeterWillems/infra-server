@@ -1,0 +1,785 @@
+# baseURI: https://w3id.org/nwb/hoofdwegennet
+# imports: https://w3id.org/list
+
+@prefix : <https://w3id.org/nwb/hoofdwegennet#> .
+@prefix list: <https://w3id.org/list#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/nwb/hoofdwegennet>
+  rdf:type owl:Ontology ;
+  owl:imports <https://w3id.org/list> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+:Coordinate
+  rdf:type owl:Class ;
+  rdfs:label "Coordinaat"@nl ;
+  rdfs:label "Coordinate"@en ;
+  rdfs:subClassOf owl:Thing ;
+.
+:DrivewayPetrolStation
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Serviceroad to / from petrol station"@en ;
+  rdfs:label "Verzorgingsbaan van/naar benzinestation"@nl ;
+  :drivewaySubtypeCode "BST" ;
+.
+:DrivewayPosition
+  rdf:type owl:Class ;
+  rdfs:comment "Dit veld is enkele gevuld bij wegvakken die behoren bij gehectometreerde wegen en geeft aan hoe een wegvak gepositioneerd is t.o.v. de wegoriëntatie lijn, en kan de waarde L(inks) , M(idden) of R(echts) hebben. De wegoriëntatie lijn is een denkbeeldige lijn midden op de weg en loopt in de richting van oplopende hectometrering."@nl ;
+  rdfs:label "Baanpostie tov Wol"@nl ;
+  rdfs:label "Driveway position"@en ;
+  rdfs:label "POS_TV_WOL" ;
+  rdfs:subClassOf owl:Thing ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          :DrivewayPositionLeft
+          :DrivewayPositionMiddle
+          :DrivewayPositionRight
+        ) ;
+    ] ;
+.
+:DrivewayPositionLeft
+  rdf:type :DrivewayPosition ;
+  rdfs:label "Baanpositie links"@nl ;
+  rdfs:label "Driveway position left"@en ;
+  :drivewayPositionCode "L" ;
+.
+:DrivewayPositionMiddle
+  rdf:type :DrivewayPosition ;
+  rdfs:label "Baanpositie midden"@nl ;
+  rdfs:label "Driveway position middle"@en ;
+  :drivewayPositionCode "M" ;
+.
+:DrivewayPositionRight
+  rdf:type :DrivewayPosition ;
+  rdfs:label "Baanpositie rechts"@nl ;
+  rdfs:label "Driveway position right"@en ;
+  :drivewayPositionCode "R" ;
+.
+:DrivewayPositionUnknown
+  rdf:type :DrivewayPosition ;
+  rdfs:label "Baanpositie onbekend"@nl ;
+  rdfs:label "Driveway position unknown"@en ;
+  :drivewayPositionCode "O" ;
+.
+:DrivewaySubtype
+  rdf:type owl:Class ;
+  rdfs:comment "Met deze code wordt een classificering van de functie die en wegvak in het wegennetwerk heeft aangegeven.Voor wegvakken die tot het hoofdwegennet behoren is dit attribuut altijd gevuld, voor overige wegen meestal niet. De belangrijkste baansubsoorten zijn :  HR : Hoofdrijbaan ; AF : Afrit, OP : Toerit ; BVD : Verbindingsweg direct ; MRB : Mini rotondebaan ; NRB : Normale rotonde baan ;"@nl ;
+  rdfs:label "BST_CODE" ;
+  rdfs:label "Baansubsoort_code"@nl ;
+  rdfs:label "Driveway subtype code"@en ;
+  rdfs:subClassOf owl:Thing ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          :DrivewaySubtypeAccess
+          :DrivewaySubtypeDirectConnection
+          :DrivewaySubtypeExit
+          :DrivewaySubtypeMainDriveway
+          :DrivewaySubtypeParallelRoad
+          :DrivewaySubtypePointPiece
+          :DrivewaySubtypeServiceRoad
+        ) ;
+    ] ;
+.
+:DrivewaySubtypeAccess
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Access"@en ;
+  rdfs:label "Toerit"@nl ;
+  :drivewaySubtypeCode "OP" ;
+  :drivewaySubtypeCode "OPR" ;
+.
+:DrivewaySubtypeBicyclePath
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Bicycle path"@en ;
+  rdfs:label "Fietspad"@nl ;
+  :drivewaySubtypeCode "FP" ;
+.
+:DrivewaySubtypeBusDriveway
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Bus driveway"@en ;
+  rdfs:label "Busbaan"@nl ;
+  :drivewaySubtypeCode "BU" ;
+.
+:DrivewaySubtypeDirectConnection
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Direct connection"@en ;
+  rdfs:label "Verbindingsweg direct"@nl ;
+  :drivewaySubtypeCode "VBD" ;
+.
+:DrivewaySubtypeExit
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Afrit"@nl ;
+  rdfs:label "Exit"@en ;
+  :drivewaySubtypeCode "AF" ;
+  :drivewaySubtypeCode "AFR" ;
+.
+:DrivewaySubtypeIndirectConnection
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Indirect connection"@en ;
+  rdfs:label "Verbindingsweg indirect"@nl ;
+  :drivewaySubtypeCode "VBI" ;
+.
+:DrivewaySubtypeIntermediateDriveway
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Intermediate driveway"@en ;
+  rdfs:label "Tussenbaan"@nl ;
+  :drivewaySubtypeCode "TN" ;
+.
+:DrivewaySubtypeMainDriveway
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Hoofdrijbaan"@nl ;
+  rdfs:label "Main driveway"@en ;
+  :drivewaySubtypeCode "HR" ;
+.
+:DrivewaySubtypeMiniRoundTrack
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Mini rotondebaan"@nl ;
+  rdfs:label "Mini round track"@en ;
+  :drivewaySubtypeCode "MRB" ;
+.
+:DrivewaySubtypeParallelRoad
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Parallel road"@en ;
+  rdfs:label "Parallelweg (niet ventweg)"@nl ;
+  :drivewaySubtypeCode "PAR" ;
+.
+:DrivewaySubtypeParkingLot
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Serviceroad to/from parking lot"@en ;
+  rdfs:label "Verzorgingsbaan van/naar parkeerplaats"@nl ;
+  :drivewaySubtypeCode "PKP" ;
+.
+:DrivewaySubtypeParkingLotWithFillingStation
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Parkeerplaats met benzinestation"@nl ;
+  rdfs:label "Parking lot with filling station"@en ;
+  :drivewaySubtypeCode "PKB" ;
+.
+:DrivewaySubtypePointPiece
+  rdf:type :DrivewaySubtype ;
+  rdfs:comment "Puntstuk =  snijpunt verharding"@nl ;
+  rdfs:label "Point piece"@en ;
+  rdfs:label "Puntstuk"@nl ;
+  :drivewaySubtypeCode "PST" ;
+.
+:DrivewaySubtypeSemiDirectConnection
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Semi direct connection"@en ;
+  rdfs:label "Verbindingsweg semi-direct"@nl ;
+  :drivewaySubtypeCode "VBS" ;
+.
+:DrivewaySubtypeServiceRoad
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Service road"@en ;
+  rdfs:label "Ventweg"@nl ;
+  :drivewaySubtypeCode "VWG" ;
+.
+:DrivewaySubtypeShortCutConnection
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Short cut connection"@en ;
+  rdfs:label "Verbindingsweg kortsluitend"@nl ;
+  :drivewaySubtypeCode "VBK" ;
+.
+:DrivewaySubtypeShortcut
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Doorsteek"@nl ;
+  rdfs:label "Short cut"@en ;
+  :drivewaySubtypeCode "DST" ;
+.
+:DrivewaySubtypeShuntingTrack
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Shunting track"@en ;
+  rdfs:label "Verbindingsweg rangeerbaan"@nl ;
+  :drivewaySubtypeCode "VBR" ;
+.
+:EmptyList_1
+  rdf:type list:EmptyList ;
+.
+:HouseNumberStructure
+  rdf:type owl:Class ;
+  rdfs:comment "Deze attributen geven aan of er zich huisnummers aan de linkerzijde (of rechterzijde) van de weg aanwezig bevinden en of deze even, oneven of een combinatie van beide zijn. De termen even en oneven worden gedefinieerd aan de hand van de positieve richting van een wegvak, lopend van een begin- naar een eindjunctie. Het waardebereik van de attributen is: ‘Even’ (E), ‘Oneven’ (O), ‘Beide’ (B), ‘Geen huisnummers aanwezig’ (N), ‘Onbekend of niet van toepassing’( .. )."@nl ;
+  rdfs:label "House number structure"@en ;
+  rdfs:label "Huisnummerstructuur"@nl ;
+  rdfs:subClassOf owl:Thing ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          :HouseNumberStructureAbsent
+          :HouseNumberStructureBoth
+          :HouseNumberStructureEven
+          :HouseNumberStructureOdd
+          :HouseNumberStructureUnknownOrInapplicable
+        ) ;
+    ] ;
+.
+:HouseNumberStructureAbsent
+  rdf:type :HouseNumberStructure ;
+  rdfs:label "Absent"@en ;
+  rdfs:label "Niet aanwezig"@nl ;
+  :houseNumberStructureCode "N" ;
+.
+:HouseNumberStructureBoth
+  rdf:type :HouseNumberStructure ;
+  rdfs:label "Beide"@nl ;
+  rdfs:label "Both"@en ;
+  :houseNumberStructureCode "B" ;
+.
+:HouseNumberStructureEven
+  rdf:type :HouseNumberStructure ;
+  rdfs:label "Even"@en ;
+  rdfs:label "Even"@nl ;
+  :houseNumberStructureCode "E" ;
+.
+:HouseNumberStructureOdd
+  rdf:type :HouseNumberStructure ;
+  rdfs:label "Odd"@en ;
+  rdfs:label "Oneven"@nl ;
+  :houseNumberStructureCode "O" ;
+.
+:HouseNumberStructureUnknownOrInapplicable
+  rdf:type :HouseNumberStructure ;
+  rdfs:label "Onbekend of niet van toepassing"@nl ;
+  rdfs:label "Unknown or inapplicable"@en ;
+  :houseNumberStructureCode "..." ;
+.
+:MultiLineString
+  rdf:type rdfs:Class ;
+  rdfs:label "Multi line string"@en ;
+  rdfs:subClassOf list:OWLList ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom :Coordinate ;
+      owl:onProperty list:hasContents ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:allValuesFrom [
+          rdf:type owl:Class ;
+          owl:unionOf (
+              :MultiLineString
+              list:EmptyList
+            ) ;
+        ] ;
+      owl:onProperty list:hasNext ;
+    ] ;
+.
+:OtherConnection
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Other connection"@en ;
+  rdfs:label "Verbindingsweg (overig)"@nl ;
+  :drivewaySubtypeCode "VBW" ;
+.
+:RelativePosition
+  rdf:type owl:Class ;
+  rdfs:label "Relatieve positie"@nl ;
+  rdfs:label "Relative position"@en ;
+  rdfs:subClassOf owl:Thing ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          :RelativePositionNorth
+          :RelativePositionSouth
+          :RelativePositionEast
+          :RelativePositionWest
+          :RelativePositionLeft
+          :RelativePositionRight
+          :RelativePositionNull
+        ) ;
+    ] ;
+.
+:RelativePositionEast
+  rdf:type :RelativePosition ;
+  rdfs:label "East"@en ;
+  rdfs:label "Oost"@nl ;
+  :relativePositionCode "O" ;
+.
+:RelativePositionLeft
+  rdf:type :RelativePosition ;
+  rdfs:comment "Links, gezien in de administratieve richting van de weg"@nl ;
+  rdfs:label "Left"@en ;
+  rdfs:label "Links"@nl ;
+  :relativePositionCode "L" ;
+.
+:RelativePositionNorth
+  rdf:type :RelativePosition ;
+  rdfs:label "Noord"@nl ;
+  rdfs:label "North"@en ;
+  :relativePositionCode "N" ;
+.
+:RelativePositionNull
+  rdf:type :RelativePosition ;
+  rdfs:label "Geen"@nl ;
+  rdfs:label "Null"@en ;
+  :relativePositionCode "#" ;
+.
+:RelativePositionRight
+  rdf:type :RelativePosition ;
+  rdfs:comment "Rechs, gezien in de administratieve richting van de weg."@nl ;
+  rdfs:label "Rechts"@nl ;
+  rdfs:label "Right"@en ;
+  :relativePositionCode "R" ;
+.
+:RelativePositionSouth
+  rdf:type :RelativePosition ;
+  rdfs:label "South"@nl ;
+  rdfs:label "Zuid"@nl ;
+  :relativePositionCode "Z" ;
+.
+:RelativePositionWest
+  rdf:type :RelativePosition ;
+  rdfs:label "West"@en ;
+  rdfs:label "West"@nl ;
+  :relativePositionCode "W" ;
+.
+:RoadAuthorityType
+  rdf:type owl:Class ;
+  rdfs:comment "Een wegbeheerder wordt gedefinieerd als een instantie of rechtspersoon die, als staatkundig onderdeel van de Nederlandse staat, een (deel van de) weg beheert. Een weg is een verzameling wegvakken die door een wegbeheerder wordt beheerd en die een min of meer aaneengesloten weg vormt (hoewel een kort ontbrekend stuk denkbaar is). Het kan hier om een straat gaan, maar bijvoorbeeld ook om een rijksweg."@nl ;
+  rdfs:label "Road authority type"@en ;
+  rdfs:label "Wegbeheerdersoort"@nl ;
+  rdfs:subClassOf owl:Thing ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          :RoadAuthorityTypeState
+          :RoadAuthorityTypeProvince
+          :RoadAuthorityTypeMunicipality
+          :RoadAuthorityTypeWaterAuthority
+        ) ;
+    ] ;
+.
+:RoadAuthorityTypeMunicipality
+  rdf:type :RoadAuthorityType ;
+  rdfs:label "Gemeente"@nl ;
+  rdfs:label "Municipality"@en ;
+  :roadAuthorityTypeCode "G" ;
+.
+:RoadAuthorityTypeProvince
+  rdf:type :RoadAuthorityType ;
+  rdfs:label "Province"@en ;
+  rdfs:label "Provincie"@nl ;
+  :roadAuthorityTypeCode "P" ;
+.
+:RoadAuthorityTypeState
+  rdf:type :RoadAuthorityType ;
+  rdfs:label "Rijk"@nl ;
+  rdfs:label "State"@en ;
+  :roadAuthorityTypeCode "R" ;
+.
+:RoadAuthorityTypeWaterAuthority
+  rdf:type :RoadAuthorityType ;
+  rdfs:label "Water authority"@en ;
+  rdfs:label "Waterschap"@nl ;
+  :roadAuthorityTypeCode "W" ;
+.
+:RoadJunction
+  rdf:type owl:Class ;
+  rdfs:comment """Een junctie gecreëerd bij: 
+<ul>
+<li>een splitsing van het wegennetwerk of het einde van een doodlopende weg</li>
+<li>een wijziging van straatnaam</li>
+<li>een gemeentegrens of een PTT-woonplaatsgrens</li>
+<li>een wijziging van de wegbeheerder of wegbeheerdersoort</li>
+<li>een wijziging van het wegnummer</li>
+<li>een dubbele hectometrering (het voorkomen van twee of meer hectometerbordjes met dezelfde hectometrering)</li>
+<li>een doorlopende straat met een keerlus</li>
+<li>indien de wegassen zich meer dan 20 meter van elkaar scheiden, worden twee juncties gecreëerd, anders één</li>
+<ul>"""@nl ;
+  rdfs:label "Junctie"@nl ;
+  rdfs:label "Road junction"@en ;
+  rdfs:subClassOf owl:Thing ;
+.
+:RoadSection
+  rdf:type owl:Class ;
+  rdfs:label "Road section"@en ;
+  rdfs:label "Wegvak"@nl ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty :beginJunction ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty :endJunction ;
+    ] ;
+.
+:Roundabout
+  rdf:type :DrivewaySubtype ;
+  rdfs:label "Rotondebaan (niet minirotondebaan)"@nl ;
+  rdfs:label "Roundabout track (not mini round track)"@en ;
+  :drivewaySubtypeCode "NRB" ;
+.
+:administrativeDirection
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "In dit attribuut wordt vastgelegd  of de fysieke richting van een wegvak ( komt overeen met de richting  begin_junctie naar eind_junctie ) overeenkomt met de administratieve richting van de weg waarvan dit wegvak deel uit maakt.  H  betekent gelijk gericht , T is tegengesteld gericht. De administratieve richting van een weg wordt toegekend door de RWS-CIV aan het hoofdwegennet en is vastgelegd in het document ‘ DE ACTUELE WEGENLIJST’ , deze richting komt over het algemeen overeen met de richting van de oplopende hectometrering. Zo loopt de administratieve richting van Rijksweg 2 van Amsterdam naar Eijsden ( Belgische grens). En rijdt het verkeer dat van Amsterdam naar Maastricht rijdt dus  over wegvakken met relatieve positie = R en dat in de andere richting rijdt over wegvakken met relatieve positie = L"@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "ADMRICHTNG" ;
+  rdfs:label "Administratieve richting"@nl ;
+  rdfs:label "Administrative direction"@en ;
+  rdfs:range xsd:boolean ;
+.
+:beginDistance
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "BEGAFSTAND" ;
+  rdfs:label "Begin distance"@en ;
+  rdfs:label "Beginafstand"@nl ;
+  rdfs:range xsd:integer ;
+.
+:beginJunction
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Begin junction"@en ;
+  rdfs:label "Beginjunctie"@nl ;
+  rdfs:label "JTE_ID_BEG" ;
+  rdfs:range :RoadJunction ;
+.
+:beginKilometer
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "BEGINKM" ;
+  rdfs:label "Begin kilometer"@en ;
+  rdfs:label "Beginkilometer"@nl ;
+  rdfs:range xsd:double ;
+.
+:drivewayPosition
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Baanpositie"@nl ;
+  rdfs:label "Driveway position"@en ;
+  rdfs:label "POS_TV_WOL" ;
+  rdfs:range :DrivewayPosition ;
+.
+:drivewayPositionCode
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :DrivewayPosition ;
+  rdfs:label "Baanpositiecode"@nl ;
+  rdfs:label "Driveway position code"@en ;
+  rdfs:range xsd:string ;
+.
+:drivewaySubtype
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "BST_CODE" ;
+  rdfs:label "Baansubsoort"@nl ;
+  rdfs:label "Driveway subtype"@en ;
+  rdfs:range :DrivewaySubtype ;
+.
+:drivewaySubtypeCode
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain :DrivewaySubtype ;
+  rdfs:label "Baansubsoort_code"@nl ;
+  rdfs:label "Driveway subtype code"@en ;
+  rdfs:range xsd:string ;
+.
+:drivingDirection
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Met dit attribuut wordt aangegeven of de verplichte rijrichting op dit wegvak gelijk op tegengesteld is aan de fysieke richting ( begin- naar eindjunctie) van een wegvak. Dit veld is enkel gevuld voor wegvakken die tot het hoofdwegennet behoren. Voor het overige wegennet is veld met blanks gevuld en betekent dus onbekende rijrichting ; H betekent gelijk en T betekent tegengesteld aan de fysieke richting."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Driving direction"@en ;
+  rdfs:label "RIJRICHTNG" ;
+  rdfs:label "Rijrichting"@nl ;
+  rdfs:range xsd:boolean ;
+.
+:endDistance
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "ENDAFSTAND" ;
+  rdfs:label "Eindafstand"@nl ;
+  rdfs:label "End distance"@en ;
+  rdfs:range xsd:integer ;
+.
+:endJunction
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Eindjunctie"@nl ;
+  rdfs:label "End junction"@en ;
+  rdfs:label "JTE_ID_END" ;
+  rdfs:range :RoadJunction ;
+.
+:endKilometer
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "EINDKM" ;
+  rdfs:label "Eindkilometer"@nl ;
+  rdfs:label "End kilometer"@en ;
+  rdfs:range xsd:double ;
+.
+:firstHouseNumberLeft
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Aanduiding van het eerste huisnummer dat zich ter linkerzijde  – gezien vanuit de beginjunctie – van een wegvak bevindt."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "E_HNR_LNKS" ;
+  rdfs:label "Eerste huisnummer links"@nl ;
+  rdfs:label "First house number left"@en ;
+  rdfs:range xsd:integer ;
+.
+:firstHouseNumberRight
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Aanduiding van het eerste huisnummer dat zich ter rechterzijde  – gezien vanuit de beginjunctie – van een wegvak bevindt."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "E_HNR_RHTS" ;
+  rdfs:label "Eerste huisnummer rechts"@nl ;
+  rdfs:label "First house number right"@en ;
+  rdfs:range xsd:integer ;
+.
+:geometry
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "the_geom" ;
+  rdfs:range :MultiLineString ;
+.
+:hectoLetter
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Dit attribuut wordt toegevoegd om het onderscheid aan te geven tussen hoofdrijbanen en nevenrijbanen. Een hectoletter is de op het hectometerbord toegevoegde letter indien het een nevenrijbaan betreft (het hoeft niet te gaan om de fysieke aanwezigheid van het bord, zie hectopunt voor uitleg). Nevenrijbanen zijn die rijbanen die geen hoofdrijbanen zijn, zoals op- en afritten (weergegeven met de letters a, b, c of d) en PKB’s (Parkeerplaats/Benzinestations, weergegeven met o.a. de letters m en n). Met betrekking tot het waardebereik kunnen voor het attribuut hectoletter alle letters van het alfabet worden gebruikt. In tegenstelling tot alle andere variabelen in het NWB worden hectoletters weergegeven in kleine letters."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "HECTO_LTTR" ;
+  rdfs:label "Hecto letter"@en ;
+  rdfs:label "Hectoletter"@nl ;
+  rdfs:range xsd:string ;
+.
+:houseNumberStructureCode
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :HouseNumberStructure ;
+  rdfs:label "House number structure code"@en ;
+  rdfs:label "Huisnummerstructurecode"@nl ;
+  rdfs:range :HouseNumberStructure ;
+.
+:houseNumberStructureLeft
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "HNRSTRLNKS" ;
+  rdfs:label "House number structure left"@en ;
+  rdfs:label "Huisnummerstructuur Links"@nl ;
+  rdfs:range :HouseNumberStructure ;
+.
+:houseNumberStructureRight
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "HNRSTRRHTS" ;
+  rdfs:label "House number structure right"@en ;
+  rdfs:label "Huisnummerstructuur Rechts"@nl ;
+  rdfs:range :HouseNumberStructure ;
+.
+:lastHouseNumberLeft
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Aanduiding van het laatste huisnummer dat zich ter linkerzijde  – gezien vanuit de beginjunctie – van een wegvak bevindt."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "L_HNR_LNKS" ;
+  rdfs:label "Laatste huisnummer links"@nl ;
+  rdfs:label "Last house number left"@en ;
+  rdfs:range xsd:integer ;
+.
+:lastHouseNumberRight
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Aanduiding van het laatste huisnummer dat zich ter rechterzijde  – gezien vanuit de beginjunctie – van een wegvak bevindt."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "L_HNR_RHTS" ;
+  rdfs:label "Laatste huisnummer rechts"@nl ;
+  rdfs:label "Last house number right"@en ;
+  rdfs:range xsd:integer ;
+.
+:lat
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :Coordinate ;
+  rdfs:label "Breedtegraad"@nl ;
+  rdfs:label "Latitude"@en ;
+  rdfs:range xsd:double ;
+.
+:lng
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :Coordinate ;
+  rdfs:label "Lengtetegraad"@nl ;
+  rdfs:label "Longitude"@en ;
+  rdfs:range xsd:double ;
+.
+:municipalityId
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Een gemeentecode is een unieke, 4-cijferige code voor elke gemeente in Nederland, die wordt betrokken van het Centraal Bureau voor de Statistiek. Een gemeentecode bevat dezelfde informatie als een gemeentenaam, met dien verstande dat met koppelen op gemeentecode fouten worden voorkomen als gevolg van verschil in schrijfwijzen van gemeentenamen."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "GME_ID" ;
+  rdfs:label "Gemeentecode"@nl ;
+  rdfs:label "Municipality ID"@en ;
+  rdfs:range xsd:integer ;
+.
+:municipalityName
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Een gemeente is een verzameling van woonplaatsen, buurten of wijken, inclusief de daarbij behorende buitengebieden en met een door de rijksoverheid vastgestelde grens. Een gemeente is samengesteld uit één of meer BAG Woonplaatsen en bevat daardoor één of meer bebouwde kommen, waarvan er één vaak dezelfde naam heeft als de gemeente in haar geheel. Een gemeente hoeft echter niet alleen uit hele Woonplaatsen te bestaan, maar kan ook delen hiervan bevatten."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "GME_NAAM" ;
+  rdfs:label "Gemeentenaam"@nl ;
+  rdfs:label "Municipality name"@en ;
+  rdfs:range xsd:string ;
+.
+:relativePosition
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment """Dit attribuut wordt gebruikt om onderscheid te kunnen maken tussen wegvakken die naast elkaar liggen (bij bv. twee baanswegen) en voor het overige dezelfde administratieve attributen hebben. 
+De relatieve positie wordt weergegeven door een letter. Voor wegen die een administratieve richting hebben , dit zijn de wegen uit het hoofdwegennet,  wordt de relatieve positie aangeduid als links (L) of rechts (R) gezien in de administratieve richting. Bij alle overige wegen wordt gebruik gemaakt van een aanduiding in windrichting (N, Z, O of W)."""@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "RPE_CODE" ;
+  rdfs:label "Relatieve positie"@nl ;
+  rdfs:label "Relative position"@en ;
+  rdfs:range :RelativePosition ;
+.
+:relativePositionCode
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RelativePosition ;
+  rdfs:range xsd:string ;
+.
+:residence
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Een woonplaats wordt gedefinieerd als het gebied dat wordt ingesloten door een verzameling straten die in de BAG als één woonplaats wordt beschouwd. Een Woonplaats omvat niet alleen de bebouwde kom, maar ook het direct omliggende gebied. Een Woonplaats kan in meer dan één gemeente liggen."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Residence"@en ;
+  rdfs:label "WPSNAAMNEN" ;
+  rdfs:label "Woonplaats"@nl ;
+  rdfs:range xsd:string ;
+.
+:roadAuthorityId
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Road authority ID"@en ;
+  rdfs:label "WEGBEHCODE" ;
+  rdfs:label "Wegbeheerdercode"@nl ;
+  rdfs:range xsd:integer ;
+.
+:roadAuthorityName
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Road authority name"@en ;
+  rdfs:label "WEGBEHNAAM" ;
+  rdfs:label "Wegbeheerdernaam"@nl ;
+  rdfs:range xsd:string ;
+.
+:roadAuthorityType
+  rdf:type owl:FunctionalProperty ;
+  rdf:type owl:ObjectProperty ;
+  rdfs:comment "Het waardebereik van dit attribuut is: beheerd door het Rijk (R), een provincie (P), een gemeente (G), een waterschap (W) of een andere wegbeheerder (T)."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Road authority type"@en ;
+  rdfs:label "WEGBEHSRT" ;
+  rdfs:label "Wegbeheerdersoort"@nl ;
+  rdfs:range :RoadAuthorityType ;
+.
+:roadAuthorityTypeCode
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain :RoadAuthorityType ;
+  rdfs:label "Road authority type code"@en ;
+  rdfs:label "Wegbeheerdertype_code"@nl ;
+  rdfs:range xsd:string ;
+.
+:roadJunctionId
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Ook elke junctie is voorzien van een uniek identificatienummer (junctie-ID). Juncties bepalen de topologie (logische verbinding tussen wegvakken) van het netwerk. Ze ontstaan op locaties waar het netwerk zich splitst (in 2 of meer wegvakken), doodloopt of in speciale gevallen zoals bij een gemeentegrens, keerlus, et cetera."@nl ;
+  rdfs:domain :RoadJunction ;
+  rdfs:label "JTE_ID" ;
+  rdfs:label "Junctie-ID"@nl ;
+  rdfs:label "Road junction ID"@en ;
+  rdfs:range xsd:long ;
+.
+:roadNumber
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment """Een wegnummer wordt gedefinieerd als het nummer van een weg zoals dat is vastgesteld door de wegbeheerder. Een wegnummer bestaat uit de volgende hoofdletters en/of cijfers: 
+<ul>
+<li>Voor rijkswegen: in uitleverformaat AIC het administratieve rijkswegnummer zoals vastgesteld door Rijkswaterstaat, bestaande uit maximaal 3 cijfers. In uitleverformaat GDF wordt in geval van rijkswegen aan bovengenoemde cijfercombinatie een ’R’ toegevoegd;</li>
+<li>Voor provinciale wegen (zowel in AIC als GDF): de door het Inter Provinciaal Overleg (IPO) – in samenwerking met de ANWB – vastgestelde nummering, bestaande uit een combinatie van één letter en maximaal 3 cijfers. Deze letter is meestal een ‘N’, maar kan in sommige gevallen ook een ‘A’ zijn. Bij hoge uitzondering betreft het een letter die door een provinciale wegbeheerder zelf is vastgesteld. Een andere uitzondering doet zich voor in de provincie Noord-Brabant, waar een eigen nummering wordt gehanteerd, bestaande uit maximaal 3 cijfers. (Proviciale wegen hebben hebben evenals de rijkswegen  ook een (ANWB) routenummer de zg A/E/N nummers die dus kunnen afwijken van de wegnummmers van de wegbeheerder) </li></ul>
+Omdat slechts  het hoofdwegennet  voorzien is van wegnummers en dus  niet alle wegvakken voorzien zijn van een wegnummer, zal een aantal velden leeg blijven. Het veld ‘straatnaam’ zal dan echter altijd gevuld zijn. Indien een wegvak geen straatnaam en/of wegnummer heeft, zal het niet in het NWB-Wegen worden opgenomen."""@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Road number"@en ;
+  rdfs:label "WEGNUMMER" ;
+  rdfs:label "Wegnummer"@nl ;
+  rdfs:range xsd:string ;
+.
+:roadPartLetter
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Een wegdeel, dat wil zeggen een gedeelte van een weg waarlangs de hectometrering uniek is, heeft over de gehele lengte eenzelfde wegdeelletter. Deze maakt samen met de hectometrering van de weg (zie hieronder) een unieke plaatsaanduiding op de weg in de lengterichting mogelijk. Standaard wordt voor een wegdeelletter de waarde ‘R’ ingevuld, tenzij een ander deel van de gehectometreerde weg dezelfde hectometrering heeft. In dat geval krijgt het volgende stuk de waarde ‘B’. Eventuele andere volgende stukken binnen dezelfde weg krijgen de waarde ‘C’ enz. Bijvoorbeeld op de A59 bij Zierikzee en de A59 tussen Den Bosch en Oss komt dezelfde hectometrering voor. Zodoende krijgt het traject Den Bosch-Oss de letter ‘B’."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Road part letter"@en ;
+  rdfs:label "WEGDEELLTR" ;
+  rdfs:label "Wegdeelletter"@nl ;
+  rdfs:range xsd:string ;
+.
+:roadSectionId
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "In het NWB-Wegen is elk wegvak voorzien van een uniek wegvak-ID, een 10-cijferig identificatienummer dat slechts eenmalig in het NWB voorkomt. Hierin verschilt dit geografische attribuut van de andere attributen – zoals een straatnaam of een wegnummer – die ook informatie verstrekken over een wegvak. Een wegnummer bijvoorbeeld kan immers betrekking hebben op meerdere wegvakken. Door de identificatiecode zijn andere gegevens en kenmerken van één wegvak eenvoudig te koppelen. Een wegvak-ID is qua uniciteit te vergelijken met een vingerafdruk van een mens, of met een kadastraal perceelnummer dat ook slechts eenmalig wordt uitgegeven."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Road section ID"@en ;
+  rdfs:label "WVK_ID" ;
+  rdfs:label "Wegvak-ID"@nl ;
+  rdfs:range xsd:long ;
+.
+:startDate
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "Begindatum"@nl ;
+  rdfs:label "Start date"@en ;
+  rdfs:label "WVK_BEGDAT" ;
+  rdfs:range xsd:date ;
+.
+:streetName
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "Een straat wordt gedefinieerd als een verzameling wegvakken die binnen een gemeente en een woonplaats onder één en dezelfde naam bekend is (voor definities van gemeente en woonplaats: zie hieronder). Alle bij de BAG bekende straten zijn in het NWB-Wegen opgenomen. Elk wegvak krijgt aan de hand van de NEN-schrijfwijze1 een PTT-straatnaam (de PTT hanteert echter een alternatieve norm). Ook straatnamen die niet voorkomen in de PTT-bestanden, bijvoorbeeld omdat er zich in een bepaalde straat geen huizen bevinden, worden in het NWB-Wegen opgenomen. In een klein aantal gevallen wordt door de RWS-CIV zelf een straatnaam toegekend."@nl ;
+  rdfs:domain :RoadSection ;
+  rdfs:label "STT_NAAM" ;
+  rdfs:label "Straatnaam"@nl ;
+  rdfs:label "Street name"@en ;
+  rdfs:range xsd:string ;
+.
+:x
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "De exacte geografische ligging van juncties en wegvakken wordt bepaald aan de hand van X- en Y-coördinaten. In het  NWB wordt  gebruik gemaakt  van het in Nederland gebruikelijke Rijksdriehoekcoördinatenstelsel ."@nl ;
+  rdfs:domain :Coordinate ;
+  rdfs:label "X-coordinate (unit: meter)"@en ;
+  rdfs:label "X-coördinaat (eenheid: meter}"@nl ;
+  rdfs:range xsd:double ;
+.
+:y
+  rdf:type owl:DatatypeProperty ;
+  rdf:type owl:FunctionalProperty ;
+  rdfs:comment "De exacte geografische ligging van juncties en wegvakken wordt bepaald aan de hand van X- en Y-coördinaten. In het  NWB wordt  gebruik gemaakt  van het in Nederland gebruikelijke Rijksdriehoekcoördinatenstelsel ."@nl ;
+  rdfs:domain :Coordinate ;
+  rdfs:label "Y-coordinate"@en ;
+  rdfs:label "Y-coördinaat"@nl ;
+  rdfs:range xsd:double ;
+.

@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1091,8 +1092,10 @@ public class DatasetService {
 				Double endKilometer = roadSection.getEndKilometer();
 				queryStr.setLiteral("beginKilometer", beginKilometer);
 				queryStr.setLiteral("endKilometer", endKilometer);
-				queryStr.append("SELECT  ?dataset ?roadPart ?hectometerStartPostValue ?hectometerEndPostValue ");
+				queryStr.append(
+						"SELECT  ?dataset ?datasetLabel ?roadPart ?hectometerStartPostValue ?hectometerEndPostValue ");
 				queryStr.append("WHERE {");
+				queryStr.append("?dataset rdfs:label ?datasetLabel .");
 				queryStr.append("?dataset meta:relatedToInfraObject ?roadPart .");
 				if (reqTopics != null && !reqTopics.isEmpty()) {
 					String reqTopic = reqTopics.get(0);
@@ -1149,6 +1152,7 @@ public class DatasetService {
 				queryStr.append("	 ) ");
 				queryStr.append(") ");
 				queryStr.append("}");
+				queryStr.append("ORDER BY ?datasetLabel");
 				JsonNode responseNodes = fuseki.query(queryStr);
 				for (int i = 0; i < responseNodes.size(); i++) {
 					JsonNode jsonNode = responseNodes.get(i);
@@ -1182,8 +1186,9 @@ public class DatasetService {
 				calendar.setTimeInMillis(reqEndDate);
 				queryStr.setLiteral("reqEndDate", calendar);
 			}
-			queryStr.append("SELECT ?dataset ?startDate ?endDate ");
+			queryStr.append("SELECT ?dataset ?datasetLabel ?startDate ?endDate ");
 			queryStr.append("WHERE {");
+			queryStr.append("?dataset rdfs:label ?datasetLabel .");
 			if (reqStartDate != null) {
 				queryStr.append("?dataset meta:measurementStartDate ?startDate . ");
 				queryStr.append("FILTER ( xsd:dateTime(?startDate) > xsd:dateTime(?reqStartDate) )  ");
@@ -1198,6 +1203,7 @@ public class DatasetService {
 				queryStr.append("	?dataset meta:hasTopic ?reqTopic . ");
 			}
 			queryStr.append("}");
+			queryStr.append("ORDER BY ?datasetLabel");
 			JsonNode responseNodes = fuseki.query(queryStr);
 			for (int i = 0; i < responseNodes.size(); i++) {
 				JsonNode jsonNode = responseNodes.get(i);
@@ -1219,10 +1225,12 @@ public class DatasetService {
 				queryStr.setNsPrefix("dce", DCE);
 				String reqTopic = reqTopics.get(index);
 				queryStr.setIri("reqTopic", reqTopic);
-				queryStr.append("SELECT  ?dataset ?topicLabel ");
+				queryStr.append("SELECT  ?dataset ?datasetLabel ?topicLabel ");
 				queryStr.append("WHERE {");
+				queryStr.append("   ?dataset rdfs:label ?datasetLabel .");
 				queryStr.append("	?dataset meta:hasTopic ?reqTopic . ");
 				queryStr.append("}");
+				queryStr.append("ORDER BY ?datasetLabel");
 				JsonNode responseNodes = fuseki.query(queryStr);
 				for (int i = 0; i < responseNodes.size(); i++) {
 					JsonNode jsonNode = responseNodes.get(i);
@@ -1238,7 +1246,14 @@ public class DatasetService {
 				}
 			}
 		}
-		return Lists.newArrayList(datasetMap.values().iterator());
+		ArrayList<Dataset> newArrayList = Lists.newArrayList(datasetMap.values().iterator());
+		newArrayList.sort(new Comparator<Dataset>() {
+			@Override
+			public int compare(Dataset dataset1, Dataset dataset2) {
+				return dataset1.getDatasetLabel().compareToIgnoreCase(dataset2.getDatasetLabel());
+			}
+		});
+		return newArrayList;
 	}
 
 }
