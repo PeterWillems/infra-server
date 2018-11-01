@@ -1,0 +1,522 @@
+# baseURI: https://w3id.org/meta
+# imports: http://datashapes.org/dash
+# imports: https://w3id.org/nwb/hoofdwegennet
+# prefix: meta
+
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix meta: <https://w3id.org/meta#> .
+@prefix mime: <http://www.sparontologies.net/mediatype/> .
+@prefix nwb: <https://w3id.org/nwb/hoofdwegennet#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/meta>
+  rdf:type owl:Ontology ;
+  owl:imports <http://datashapes.org/dash> ;
+  owl:imports <https://w3id.org/nwb/hoofdwegennet> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+meta:Bridge
+  rdf:type meta:CivilStructureType ;
+  rdfs:label "Bridge"@en ;
+  rdfs:label "Brug"@nl ;
+.
+meta:COMMA
+  rdf:type meta:CSVDecimalSymbol ;
+  rdf:type meta:CSVSeparator ;
+  rdfs:label "COMMA"@en ;
+  rdfs:label "KOMMA"@nl ;
+.
+meta:CSVDecimalSymbol
+  rdf:type owl:Class ;
+  rdfs:label "CSVDecimalSymbol"@en ;
+  rdfs:label "CSVDecimalSymbol"@nl ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          meta:DOT
+          meta:COMMA
+        ) ;
+    ] ;
+.
+meta:CSVSeparator
+  rdf:type owl:Class ;
+  rdfs:label "CSVSeparator"@en ;
+  rdfs:label "CSVSeparator"@nl ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          meta:COMMA
+          meta:SEMICOLON
+          meta:DOT
+          meta:SPACE
+        ) ;
+    ] ;
+.
+meta:CivilStructureType
+  rdf:type owl:Class ;
+  rdfs:label "CivilStructureType"@en ;
+  rdfs:label "KunstwerkType"@nl ;
+.
+meta:DOT
+  rdf:type meta:CSVDecimalSymbol ;
+  rdf:type meta:CSVSeparator ;
+  rdfs:label "DOT"@en ;
+  rdfs:label "PUNT"@nl ;
+.
+meta:DataStructure
+  rdf:type owl:Class ;
+.
+meta:Dataset
+  rdf:type owl:Class ;
+  rdfs:label "Dataset" ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:hasTopic ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:measurementEndDate ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:measurementStartDate ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+      owl:onProperty dc:format ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:basedOn ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:forProject ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:measurementYear ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:quantityKindAndUnit ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:minCardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:relatedToInfraObject ;
+    ] ;
+.
+meta:Dike
+  rdf:type meta:CivilStructureType ;
+  rdfs:label "Dijk"@nl ;
+  rdfs:label "Dike"@en ;
+.
+meta:DrivingdeckStateType
+  rdf:type owl:Class ;
+  rdfs:label "DrivingDeckStateType"@en ;
+  rdfs:label "RijdekToestandType"@nl ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          meta:ZOAB
+          meta:ZOABPLUS
+          meta:ZOAB-ZOABPLUS
+          meta:ZOABTW
+        ) ;
+    ] ;
+.
+meta:Fatigue
+  rdf:type meta:Topic ;
+  rdfs:label "Fatique"@en ;
+  rdfs:label "Vermoeiing"@nl ;
+.
+meta:File
+  rdf:type owl:Class ;
+  rdfs:label "File" ;
+  rdfs:subClassOf meta:Dataset ;
+.
+meta:Folder
+  rdf:type owl:Class ;
+  rdfs:label "Folder" ;
+  rdfs:subClassOf meta:Dataset ;
+.
+meta:InfraObject
+  rdf:type owl:Class ;
+  rdfs:label "InfraObject"@en ;
+  rdfs:label "InfraObject"@nl ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:endRoadNetworkLocation ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:startRoadNetworkLocation ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:minCardinality "0"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:inRoadSection ;
+    ] ;
+.
+meta:Organisation
+  rdf:type owl:Class ;
+  rdfs:label "Orgainisation"@en ;
+  rdfs:label "Organisatie"@nl ;
+.
+meta:Person
+  rdf:type owl:Class ;
+  rdfs:label "Person"@en ;
+  rdfs:label "Persoon"@nl ;
+.
+meta:Project
+  rdf:type owl:Class ;
+  rdfs:label "Project"@en ;
+  rdfs:label "Project"@nl ;
+.
+meta:QuantityKindAndUnit
+  rdf:type owl:Class ;
+  rdfs:label "GrootheidEnEenheid"@nl ;
+  rdfs:label "QuantityKindAndUnit"@en ;
+  rdfs:subClassOf owl:Thing ;
+.
+meta:Ravelling
+  rdf:type meta:Topic ;
+  rdfs:label "Rafeling"@nl ;
+  rdfs:label "Ravelling"@en ;
+.
+meta:RoadNetworkLocation
+  rdf:type owl:Class ;
+  rdfs:label "RoadNetworkLocation"@en ;
+  rdfs:subClassOf owl:Thing ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:distance ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:hectometerPostReference ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:hectometerPostValue ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:laneReference ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:roadReference ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:cardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:wayReference ;
+    ] ;
+  rdfs:subClassOf [
+      rdf:type owl:Restriction ;
+      owl:maxCardinality "1"^^xsd:nonNegativeInteger ;
+      owl:onProperty meta:trackReference ;
+    ] ;
+.
+meta:RoadPart
+  rdf:type owl:Class ;
+  rdfs:label "RoadPart"@en ;
+  rdfs:label "WegDeel"@nl ;
+  rdfs:subClassOf meta:InfraObject ;
+.
+meta:SEMICOLON
+  rdf:type meta:CSVSeparator ;
+  rdfs:label "PUNTKOMMA"@nl ;
+  rdfs:label "SEMICOLON"@en ;
+.
+meta:SPACE
+  rdf:type meta:CSVSeparator ;
+  rdfs:label "SPACE"@en ;
+  rdfs:label "SPATIE"@nl ;
+.
+meta:Sluice
+  rdf:type meta:CivilStructureType ;
+  rdfs:label "Sluice"@en ;
+  rdfs:label "Sluis"@nl ;
+.
+meta:Strain
+  rdf:type meta:Topic ;
+  rdfs:label "Strain"@en ;
+  rdfs:label "Verplaatsing"@nl ;
+.
+meta:Topic
+  rdf:type owl:Class ;
+  rdfs:label "Onderwerp"@nl ;
+  rdfs:label "Topic"@en ;
+.
+meta:ToplayerType
+  rdf:type owl:Class ;
+  rdfs:label "DeklaagType"@nl ;
+  rdfs:label "ToplayerType"@en ;
+  owl:equivalentClass [
+      rdf:type owl:Class ;
+      owl:oneOf (
+          meta:ZOAB
+          meta:ZOABPLUS
+          meta:ZOAB-ZOABPLUS
+          meta:ZOABTW
+        ) ;
+    ] ;
+.
+meta:Tunnel
+  rdf:type meta:CivilStructureType ;
+  rdfs:label "Tunnel"@en ;
+  rdfs:label "Tunnel"@nl ;
+.
+meta:basedOn
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "basedOn"@en ;
+  rdfs:label "gebaseerdOp"@nl ;
+  rdfs:range meta:Dataset ;
+.
+meta:contactPerson
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "contactPersoon"@nl ;
+  rdfs:label "contactperson"@en ;
+  rdfs:range meta:Person ;
+.
+meta:csvDecimalSymbol
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "csvDecimalSymbol"@en ;
+  rdfs:label "csvDecimalSymbool"@nl ;
+  rdfs:range meta:CSVDecimalSymbol ;
+.
+meta:csvSeparatorSymbol
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "csvSeparatorSymbol"@en ;
+  rdfs:label "csvSeparatorSymbool"@nl ;
+  rdfs:range meta:CSVSeparator ;
+.
+meta:dataReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "dataReference"@en ;
+  rdfs:label "dataReferentie"@nl ;
+  rdfs:range xsd:anyURI ;
+.
+meta:dataStructureReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "dataStructureReference"@en ;
+  rdfs:label "dataStructuurReferentie"@nl ;
+  rdfs:range xsd:anyURI ;
+.
+meta:distance
+  rdf:type owl:DatatypeProperty ;
+  rdfs:label "afstand"@nl ;
+  rdfs:label "distance"@en ;
+  rdfs:range xsd:integer ;
+.
+meta:eMailAddress
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Person ;
+  rdfs:label "eMailAddress"@en ;
+  rdfs:label "eMailAdres"@nl ;
+  rdfs:range xsd:string ;
+.
+meta:endRoadNetworkLocation
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:InfraObject ;
+  rdfs:label "eindWegNetwerkLocatie"@nl ;
+  rdfs:label "endRoadNetworkLocation"@en ;
+  rdfs:range meta:RoadNetworkLocation ;
+.
+meta:forProject
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "forProject"@en ;
+  rdfs:label "voorProject"@nl ;
+  rdfs:range meta:Project ;
+.
+meta:hasContent
+  rdf:type rdf:Property ;
+  rdfs:domain meta:Folder ;
+  rdfs:label "hasContent" ;
+  rdfs:range [
+      rdf:type owl:Class ;
+      owl:unionOf (
+          meta:Folder
+          meta:File
+        ) ;
+    ] ;
+.
+meta:hasOwner
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "hasOwner"@en ;
+  rdfs:label "heeftEigenaar"@nl ;
+  rdfs:range meta:Organisation ;
+.
+meta:hasTopic
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "hasTopic"@en ;
+  rdfs:label "heeftOnderwerp"@nl ;
+  rdfs:range meta:Topic ;
+.
+meta:hectometerPostReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:RoadNetworkLocation ;
+  rdfs:label "hectometerPaalReferentie"@en ;
+  rdfs:label "hectometerPostReference"@nl ;
+  rdfs:range xsd:string ;
+.
+meta:hectometerPostValue
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:RoadNetworkLocation ;
+  rdfs:label "hectometerPaalValue"@en ;
+  rdfs:label "hectometerPostWaarde"@nl ;
+  rdfs:range xsd:decimal ;
+.
+meta:inRoadSection
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:InfraObject ;
+  rdfs:label "inRoadSection"@en ;
+  rdfs:label "inWegVak"@nl ;
+  rdfs:range nwb:RoadSection ;
+.
+meta:laneReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:RoadNetworkLocation ;
+  rdfs:label "laneReference"@en ;
+  rdfs:label "strookReferentie"@nl ;
+  rdfs:range xsd:string ;
+.
+meta:measurementEndDate
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "measurementEndDate"@en ;
+  rdfs:label "meetEindDatum"@nl ;
+  rdfs:range xsd:date ;
+.
+meta:measurementFrequentie
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "measurementFrequentie"@en ;
+  rdfs:label "meetFrequentie"@nl ;
+  rdfs:range xsd:float ;
+.
+meta:measurementStartDate
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "measurementStartDate"@en ;
+  rdfs:label "meetStartDatum"@nl ;
+  rdfs:range xsd:date ;
+.
+meta:measurementYear
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "measurementYear"@en ;
+  rdfs:label "meetJaar"@nl ;
+  rdfs:range xsd:gYear ;
+.
+meta:quantityKindAndUnit
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "grootheidEnEenheid"@nl ;
+  rdfs:label "quantityAndUnit"@en ;
+  rdfs:range meta:QuantityKindAndUnit ;
+.
+meta:quantityReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:QuantityKindAndUnit ;
+  rdfs:label "grootheidReferentie"@nl ;
+  rdfs:label "quantityReference"@en ;
+  rdfs:range xsd:string ;
+.
+meta:realisationDate
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:RoadPart ;
+  rdfs:label "aanlegDatum"@nl ;
+  rdfs:label "realisationDate"@en ;
+  rdfs:range xsd:date ;
+.
+meta:relatedToInfraObject
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "relateerdAanInfraObject"@nl ;
+  rdfs:label "relatesToInfraObject"@en ;
+  rdfs:range meta:InfraObject ;
+.
+meta:roadReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:RoadNetworkLocation ;
+  rdfs:label "roadReference"@en ;
+  rdfs:label "wegReferentie"@nl ;
+  rdfs:range xsd:string ;
+.
+meta:startRoadNetworkLocation
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:InfraObject ;
+  rdfs:label "startRoadNetwerkLocation"@en ;
+  rdfs:label "startWegNetwerkLocatie"@nl ;
+  rdfs:range meta:RoadNetworkLocation ;
+.
+meta:trackReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:RoadNetworkLocation ;
+  rdfs:label "spoorReferentie"@nl ;
+  rdfs:label "trackReference"@en ;
+  rdfs:range xsd:string ;
+.
+meta:unitReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:QuantityKindAndUnit ;
+  rdfs:label "eenheidReferentie"@nl ;
+  rdfs:label "unitReference"@en ;
+  rdfs:range xsd:string ;
+.
+meta:wayReference
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:RoadNetworkLocation ;
+  rdfs:label "baanReferentie"@nl ;
+  rdfs:label "wayReference"@en ;
+  rdfs:range xsd:string ;
+.
+meta:worksFor
+  rdf:type owl:ObjectProperty ;
+  rdfs:domain meta:Person ;
+  rdfs:label "werktVoor"@nl ;
+  rdfs:label "worksFor"@en ;
+  rdfs:range meta:Organisation ;
+.
+meta:zipped
+  rdf:type owl:DatatypeProperty ;
+  rdfs:domain meta:Dataset ;
+  rdfs:label "zipped"@en ;
+  rdfs:label "zipped"@nl ;
+  rdfs:range xsd:boolean ;
+.
+nwb:CivilStructure
+  rdfs:subClassOf meta:InfraObject ;
+.

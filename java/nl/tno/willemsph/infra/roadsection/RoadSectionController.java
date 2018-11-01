@@ -73,7 +73,7 @@ public class RoadSectionController {
 	public List<DrivewaySubtype> getDrivewaySubtypes() throws IOException {
 		return roadSectionService.getDrivewaySubtypes();
 	}
-	
+
 	@CrossOrigin
 	@RequestMapping("/civilstructures")
 	public List<CivilStructure> getAllCivilStructures(@RequestParam("road") Optional<String> roadId,
@@ -81,6 +81,18 @@ public class RoadSectionController {
 			@RequestParam("beginKilometer") Optional<Double> beginKilometer,
 			@RequestParam("endKilometer") Optional<Double> endKilometer) throws IOException {
 		return roadSectionService.getAllCivilStructures(roadId, direction, beginKilometer, endKilometer);
+	}
+
+	@CrossOrigin
+	@RequestMapping("/civilstructures/{localName}/")
+	public CivilStructure getCivilStructure(@PathVariable() String localName) throws IOException {
+		return roadSectionService.getCivilStructure(localName);
+	}
+
+	@CrossOrigin
+	@RequestMapping("/civilstructures/{localName}/geometry")
+	public Geometry getCivilStructureGeometry(@PathVariable() String localName) throws IOException {
+		return roadSectionService.getCivilStructureGeometry(SparqlService.HOOFDWEGENNET_DATA + "#" + localName);
 	}
 
 }

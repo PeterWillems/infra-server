@@ -34,6 +34,10 @@ import org.springframework.stereotype.Service;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import nl.tno.willemsph.infra.SparqlService;
+import nl.tno.willemsph.infra.dataset.Dataset.DecimalSymbol;
+import nl.tno.willemsph.infra.dataset.Dataset.Format;
+import nl.tno.willemsph.infra.dataset.Dataset.Separator;
+import nl.tno.willemsph.infra.roadsection.CivilStructure;
 import nl.tno.willemsph.infra.roadsection.RoadSection;
 import nl.tno.willemsph.infra.roadsection.RoadSectionService;
 
@@ -56,10 +60,22 @@ public class DatasetService {
 		queryStr.setNsPrefix("metadata", METADATA);
 		queryStr.setNsPrefix("dce", DCE);
 		queryStr.append(
-				"SELECT DISTINCT ?dataset ?datasetLabel ?dataReference ?measurementStartDate ?measurementEndDate ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
+				"SELECT DISTINCT ?dataset ?datasetLabel ?dataReference ?measurementStartDate ?measurementEndDate ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraObjectType ?infraLabel ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
-		queryStr.append("  ?dataset rdf:type meta:File .");
-		queryStr.append("  ?dataset rdfs:label ?datasetLabel .");
+		queryStr.append("  { ");
+		queryStr.append("    OPTIONAL { ");
+		queryStr.append("      ?dataset rdf:type meta:File ;");
+		queryStr.append("        rdfs:label ?datasetLabel .");
+		queryStr.append("    } ");
+		queryStr.append("  } UNION { ");
+		queryStr.append("    OPTIONAL { ");
+		queryStr.append("      ?dataset rdf:type meta:Folder ;");
+		queryStr.append("        rdfs:label ?datasetLabel .");
+		queryStr.append("    } ");
+		queryStr.append("  } ");
+
+		// queryStr.append(" ?dataset rdf:type meta:File .");
+		// queryStr.append(" ?dataset rdfs:label ?datasetLabel .");
 		queryStr.append("  OPTIONAL {    ?dataset meta:csvDecimalSymbol ?decimalSymbol . } ");
 		queryStr.append("  OPTIONAL {    ?dataset meta:csvSeparatorSymbol ?separator . } ");
 		queryStr.append("  OPTIONAL {    ?dataset dce:format ?format . } ");
@@ -84,6 +100,7 @@ public class DatasetService {
 		queryStr.append("  }");
 		queryStr.append("  OPTIONAL {  ");
 		queryStr.append("      ?dataset meta:relatedToInfraObject ?infraObject . ");
+		queryStr.append("      ?infraObject rdf:type ?infraObjectType .  ");
 		queryStr.append("      ?infraObject rdfs:label ?infraLabel .  ");
 		queryStr.append("      ?infraObject meta:startRoadNetworkLocation ?startLocation .  ");
 		queryStr.append("      ?infraObject meta:endRoadNetworkLocation ?endLocation .  ");
@@ -92,6 +109,9 @@ public class DatasetService {
 		queryStr.append("      ?startLocation meta:laneReference ?lane .  ");
 		queryStr.append("      ?startLocation meta:hectometerPostReference ?start .  ");
 		queryStr.append("      ?endLocation meta:hectometerPostReference ?end .  ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:relatedToInfraObject ?infraObject . ");
 		queryStr.append("  }");
 		queryStr.append("}");
 		queryStr.append("ORDER BY ?datasetLabel");
@@ -136,8 +156,17 @@ public class DatasetService {
 			URI format = formatNode != null ? new URI(formatNode.get("value").asText()) : null;
 			JsonNode infraObjectNode = node.get("infraObject");
 			URI infraObjectUri = infraObjectNode != null ? new URI(infraObjectNode.get("value").asText()) : null;
+			JsonNode infraObjectTypeNode = node.get("infraObjectType");
+			URI infraObjectType = infraObjectTypeNode != null ? new URI(infraObjectTypeNode.get("value").asText())
+					: null;
+			String infraLabel = null;
 			JsonNode infraLabelNode = node.get("infraLabel");
-			String infraLabel = infraLabelNode != null ? infraLabelNode.get("value").asText() : null;
+			if (infraLabelNode == null) {
+				CivilStructure civilStructure = roadSectionService.getCivilStructure(infraObjectUri.getFragment());
+				infraLabel = civilStructure.getInventOms();
+			} else {
+				infraLabel = infraLabelNode != null ? infraLabelNode.get("value").asText() : null;
+			}
 			JsonNode roadNode = node.get("road");
 			String road = roadNode != null ? roadNode.get("value").asText() : null;
 			JsonNode wayNode = node.get("way");
@@ -165,6 +194,12 @@ public class DatasetService {
 			dataset.setQuantityKindAndUnits(quantityKindAndUnits);
 			if (infraObjectUri != null) {
 				InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
+				if (infraObjectType == null) { // Civil structure !!!
+					CivilStructure civilStructure = roadSectionService.getCivilStructure(infraObjectUri.getFragment());
+					infraObject.setRoad("R" + civilStructure.getWegnummer());
+					infraObject.setStart(civilStructure.getBeginKm());
+					infraObject.setEnd(civilStructure.getEindKm());
+				}
 				infraObjects.add(infraObject);
 			}
 			dataset.setInfraObjects(infraObjects);
@@ -180,7 +215,7 @@ public class DatasetService {
 		queryStr.setNsPrefix("dce", DCE);
 		queryStr.setIri("dataset", datasetId);
 		queryStr.append(
-				"SELECT DISTINCT ?datasetLabel ?dataReference ?measurementStartDate ?measurementEndDate ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraLabel ?road ?way ?lane ?start ?end ");
+				"SELECT DISTINCT ?datasetLabel ?dataReference ?measurementStartDate ?measurementEndDate ?project ?projectLabel ?organisation ?ownerLabel ?topic ?topicLabel ?contact ?contactLabel ?decimalSymbol ?separator ?format ?infraObject ?infraObjectType ?infraLabel ?road ?way ?lane ?start ?end ");
 		queryStr.append("WHERE {");
 		queryStr.append("  ?dataset rdfs:label ?datasetLabel .");
 		queryStr.append("  OPTIONAL {    ?dataset meta:csvDecimalSymbol ?decimalSymbol . } ");
@@ -207,6 +242,7 @@ public class DatasetService {
 		queryStr.append("  }");
 		queryStr.append("  OPTIONAL {  ");
 		queryStr.append("      ?dataset meta:relatedToInfraObject ?infraObject . ");
+		queryStr.append("      ?infraObject rdf:type ?infraObjectType .  ");
 		queryStr.append("      ?infraObject rdfs:label ?infraLabel .  ");
 		queryStr.append("      ?infraObject meta:startRoadNetworkLocation ?startLocation .  ");
 		queryStr.append("      ?infraObject meta:endRoadNetworkLocation ?endLocation .  ");
@@ -215,6 +251,9 @@ public class DatasetService {
 		queryStr.append("      ?startLocation meta:laneReference ?lane .  ");
 		queryStr.append("      ?startLocation meta:hectometerPostReference ?start .  ");
 		queryStr.append("      ?endLocation meta:hectometerPostReference ?end .  ");
+		queryStr.append("  }");
+		queryStr.append("  OPTIONAL {  ");
+		queryStr.append("    ?dataset meta:relatedToInfraObject ?infraObject . ");
 		queryStr.append("  }");
 		queryStr.append("}");
 		queryStr.append("ORDER BY ?datasetLabel");
@@ -258,8 +297,17 @@ public class DatasetService {
 			URI format = formatNode != null ? new URI(formatNode.get("value").asText()) : null;
 			JsonNode infraObjectNode = node.get("infraObject");
 			URI infraObjectUri = infraObjectNode != null ? new URI(infraObjectNode.get("value").asText()) : null;
+			JsonNode infraObjectTypeNode = node.get("infraObjectType");
+			URI infraObjectType = infraObjectTypeNode != null ? new URI(infraObjectTypeNode.get("value").asText())
+					: null;
 			JsonNode infraLabelNode = node.get("infraLabel");
 			String infraLabel = infraLabelNode != null ? infraLabelNode.get("value").asText() : null;
+			if (infraLabelNode == null) {
+				CivilStructure civilStructure = roadSectionService.getCivilStructure(infraObjectUri.getFragment());
+				infraLabel = civilStructure.getInventOms();
+			} else {
+				infraLabel = infraLabelNode != null ? infraLabelNode.get("value").asText() : null;
+			}
 			JsonNode roadNode = node.get("road");
 			String road = roadNode != null ? roadNode.get("value").asText() : null;
 			JsonNode wayNode = node.get("way");
@@ -285,6 +333,12 @@ public class DatasetService {
 			dataset.setQuantityKindAndUnits(quantityKindAndUnits);
 			if (infraObjectUri != null) {
 				InfraObject infraObject = new InfraObject(infraObjectUri, infraLabel, road, way, lane, start, end);
+				if (infraObjectType == null) { // Civil structure !!!
+					CivilStructure civilStructure = roadSectionService.getCivilStructure(infraObjectUri.getFragment());
+					infraObject.setRoad("R" + civilStructure.getWegnummer());
+					infraObject.setStart(civilStructure.getBeginKm());
+					infraObject.setEnd(civilStructure.getEindKm());
+				}
 				infraObjects.add(infraObject);
 			}
 			dataset.setInfraObjects(infraObjects);
@@ -354,16 +408,28 @@ public class DatasetService {
 		queryStr.setNsPrefix("metadata", METADATA);
 		queryStr.append("SELECT  ?year ");
 		queryStr.append("WHERE {");
-		queryStr.append("  ?dataset rdf:type meta:File ;");
-		queryStr.append("    meta:measurementYear ?year .");
+		queryStr.append("  { ");
+		queryStr.append("    OPTIONAL { ");
+		queryStr.append("      ?dataset rdf:type meta:File ;");
+		queryStr.append("      meta:measurementYear ?year .");
+		queryStr.append("    } ");
+		queryStr.append("  } UNION { ");
+		queryStr.append("    OPTIONAL { ");
+		queryStr.append("      ?dataset rdf:type meta:Folder ;");
+		queryStr.append("      meta:measurementYear ?year .");
+		queryStr.append("    } ");
+		queryStr.append("  } ");
 		queryStr.append("}");
 		queryStr.append("ORDER BY ?year");
 		JsonNode responseNodes = fuseki.query(queryStr);
 		List<String> years = new ArrayList<>();
 		for (JsonNode node : responseNodes) {
-			String year = node.get("year").get("value").asText();
+			JsonNode yearNode = node.get("year");
+			String year = yearNode != null ? yearNode.get("value").asText() : null;
 			System.out.println("Year: " + year);
-			years.add(year);
+			if (year != null) {
+				years.add(year);
+			}
 		}
 		return years;
 	}
@@ -389,13 +455,22 @@ public class DatasetService {
 		updateOrganisationOfDataset(storedDataset, updatedDataset);
 		updateContactOfDataset(storedDataset, updatedDataset);
 		updateTopicOfDataset(storedDataset, updatedDataset);
-		if (!storedDataset.getDecimalSymbol().equals(updatedDataset.getDecimalSymbol())) {
+		DecimalSymbol decimalSymbol = storedDataset.getDecimalSymbol();
+		if (decimalSymbol == null && updatedDataset.getDecimalSymbol() != null) {
+			updateDecimalSymbolOfDataset(updatedDataset);
+		} else if (decimalSymbol != null && !decimalSymbol.equals(updatedDataset.getDecimalSymbol())) {
 			updateDecimalSymbolOfDataset(updatedDataset);
 		}
-		if (!storedDataset.getSeparator().equals(updatedDataset.getSeparator())) {
+		Separator separator = storedDataset.getSeparator();
+		if (separator == null && updatedDataset.getSeparator() != null) {
+			updateSeparatorOfDataset(updatedDataset);
+		} else if (separator != null && !separator.equals(updatedDataset.getSeparator())) {
 			updateSeparatorOfDataset(updatedDataset);
 		}
-		if (!storedDataset.getFormat().equals(updatedDataset.getFormat())) {
+		Format format = storedDataset.getFormat();
+		if (format == null && updatedDataset.getFormat() != null) {
+			updateFormatOfDataset(updatedDataset);
+		} else if (format != null && !format.equals(updatedDataset.getFormat())) {
 			updateFormatOfDataset(updatedDataset);
 		}
 		updateDataReferenceOfDataset(storedDataset, updatedDataset);
@@ -429,8 +504,17 @@ public class DatasetService {
 			queryStr.setIri("dataset", storedDataset.getDatasetUri());
 			queryStr.append("DELETE { ?dataset meta:measurementYear ?year . } ");
 			queryStr.append("WHERE {");
-			queryStr.append("  ?dataset rdf:type meta:File ;");
-			queryStr.append("  OPTIONAL { meta:measurementYear ?year . } ");
+			queryStr.append("  { ");
+			queryStr.append("    OPTIONAL { ");
+			queryStr.append("      ?dataset rdf:type meta:File ;");
+			queryStr.append("      meta:measurementYear ?year .");
+			queryStr.append("    } ");
+			queryStr.append("  } UNION { ");
+			queryStr.append("    OPTIONAL { ");
+			queryStr.append("      ?dataset rdf:type meta:Folder ;");
+			queryStr.append("      meta:measurementYear ?year .");
+			queryStr.append("    } ");
+			queryStr.append("  } ");
 			queryStr.append("}");
 			fuseki.update(queryStr);
 
@@ -471,8 +555,17 @@ public class DatasetService {
 			queryStr.setIri("dataset", storedDataset.getDatasetUri());
 			queryStr.append("DELETE { ?dataset meta:quantityKindAndUnit ?quantity . } ");
 			queryStr.append("WHERE {");
-			queryStr.append("  ?dataset rdf:type meta:File ;");
-			queryStr.append("    meta:quantityKindAndUnit ?quantity .");
+			queryStr.append("  { ");
+			queryStr.append("    OPTIONAL { ");
+			queryStr.append("      ?dataset rdf:type meta:File ;");
+			queryStr.append("      meta:quantityKindAndUnit ?quantity .");
+			queryStr.append("    } ");
+			queryStr.append("  } UNION { ");
+			queryStr.append("    OPTIONAL { ");
+			queryStr.append("      ?dataset rdf:type meta:Folder ;");
+			queryStr.append("      meta:quantityKindAndUnit ?quantity .");
+			queryStr.append("    } ");
+			queryStr.append("  } ");
 			queryStr.append("}");
 			fuseki.update(queryStr);
 
@@ -516,10 +609,13 @@ public class DatasetService {
 			queryStr.append("  ?dataset meta:relatedToInfraObject ?infra_object . ");
 			queryStr.append("  ?infra_object ?pred ?value . ");
 			queryStr.append("}");
-			queryStr.append("WHERE {");
-			queryStr.append("  ?dataset rdf:type meta:File ;");
-			queryStr.append("    meta:relatedToInfraObject ?infra_object .");
-			queryStr.append("}");
+			queryStr.append("WHERE { { ");
+			queryStr.append("  OPTIONAL { ?dataset rdf:type meta:File ; ");
+			queryStr.append("    meta:relatedToInfraObject ?infra_object . } ");
+			queryStr.append("  } UNION { ");
+			queryStr.append("  OPTIONAL { ?dataset rdf:type meta:Folder ; ");
+			queryStr.append("    meta:relatedToInfraObject ?infra_object . } ");
+			queryStr.append("} } ");
 			fuseki.update(queryStr);
 
 			for (InfraObject infraObject : updatedDataset.getInfraObjects()) {
@@ -532,36 +628,48 @@ public class DatasetService {
 				queryStr.setIri("start", start.toString());
 				queryStr.setLiteral("start_label", start.getFragment());
 				queryStr.setLiteral("start_hectometer", String.valueOf(infraObject.getStart()));
-				queryStr.setLiteral("start_lane", infraObject.getLane());
+				String lane = infraObject.getLane();
+				if (lane != null) {
+					queryStr.setLiteral("start_lane", infraObject.getLane());
+				}
 				queryStr.setLiteral("start_road", infraObject.getRoad());
-				queryStr.setLiteral("start_way", infraObject.getWay());
+				String way = infraObject.getWay();
+				if (way != null) {
+					queryStr.setLiteral("start_way", infraObject.getWay());
+				}
 				URI end = new URI(METADATA + "ID" + UUID.randomUUID().toString());
 				queryStr.setIri("end", end.toString());
 				queryStr.setLiteral("end_label", end.getFragment());
 				queryStr.setLiteral("end_hectometer", String.valueOf(infraObject.getEnd()));
-				queryStr.setLiteral("end_lane", infraObject.getLane());
+				if (lane != null) {
+					queryStr.setLiteral("end_lane", infraObject.getLane());
+				}
 				queryStr.setLiteral("end_road", infraObject.getRoad());
-				queryStr.setLiteral("end_way", infraObject.getWay());
+				if (way != null) {
+					queryStr.setLiteral("end_way", infraObject.getWay());
+				}
 				queryStr.setLiteral("distance", 0);
 				queryStr.append("INSERT { ");
 				queryStr.append("  ?dataset meta:relatedToInfraObject ?infra_object . ");
-				queryStr.append("  ?infra_object rdf:type meta:RoadPart . ");
-				queryStr.append("  ?start rdf:type meta:RoadNetworkLocation ; ");
-				queryStr.append("    rdfs:label ?start_label ; ");
-				queryStr.append("    meta:distance ?distance ; ");
-				queryStr.append("    meta:hectometerPostReference ?start_hectometer ; ");
-				queryStr.append("    meta:laneReference ?start_lane ; ");
-				queryStr.append("    meta:roadReference ?start_road ; ");
-				queryStr.append("    meta:wayReference ?start_way . ");
-				queryStr.append("  ?end rdf:type meta:RoadNetworkLocation ; ");
-				queryStr.append("    rdfs:label ?end_label ; ");
-				queryStr.append("    meta:distance ?distance ; ");
-				queryStr.append("    meta:hectometerPostReference ?end_hectometer ; ");
-				queryStr.append("    meta:laneReference ?end_lane ; ");
-				queryStr.append("    meta:roadReference ?end_road ; ");
-				queryStr.append("    meta:wayReference ?end_way . ");
-				queryStr.append("  ?infra_object meta:startRoadNetworkLocation ?start . ");
-				queryStr.append("  ?infra_object meta:endRoadNetworkLocation ?end . ");
+				if (lane != null) {
+					queryStr.append("  ?infra_object rdf:type meta:RoadPart . ");
+					queryStr.append("  ?start rdf:type meta:RoadNetworkLocation ; ");
+					queryStr.append("    rdfs:label ?start_label ; ");
+					queryStr.append("    meta:distance ?distance ; ");
+					queryStr.append("    meta:hectometerPostReference ?start_hectometer ; ");
+					queryStr.append("    meta:laneReference ?start_lane ; ");
+					queryStr.append("    meta:roadReference ?start_road ; ");
+					queryStr.append("    meta:wayReference ?start_way . ");
+					queryStr.append("  ?end rdf:type meta:RoadNetworkLocation ; ");
+					queryStr.append("    rdfs:label ?end_label ; ");
+					queryStr.append("    meta:distance ?distance ; ");
+					queryStr.append("    meta:hectometerPostReference ?end_hectometer ; ");
+					queryStr.append("    meta:laneReference ?end_lane ; ");
+					queryStr.append("    meta:roadReference ?end_road ; ");
+					queryStr.append("    meta:wayReference ?end_way . ");
+					queryStr.append("  ?infra_object meta:startRoadNetworkLocation ?start . ");
+					queryStr.append("  ?infra_object meta:endRoadNetworkLocation ?end . ");
+				}
 				queryStr.append("}");
 				queryStr.append("WHERE {");
 				queryStr.append("}");
@@ -675,7 +783,7 @@ public class DatasetService {
 		queryStr.setIri("new_decimal_symbol", dataset.getDecimalSymbol().getUri().toString());
 		queryStr.append("  DELETE { ?subject meta:csvDecimalSymbol ?decimal_symbol } ");
 		queryStr.append("  INSERT { ?subject meta:csvDecimalSymbol ?new_decimal_symbol } ");
-		queryStr.append("WHERE { ?subject meta:csvDecimalSymbol ?decimal_symbol . ");
+		queryStr.append("WHERE { OPTIONAL { ?subject meta:csvDecimalSymbol ?decimal_symbol . } ");
 		queryStr.append("}");
 
 		fuseki.update(queryStr);
@@ -688,7 +796,7 @@ public class DatasetService {
 		queryStr.setIri("new_separator_symbol", dataset.getSeparator().getUri().toString());
 		queryStr.append("  DELETE { ?subject meta:csvSeparatorSymbol ?separator_symbol } ");
 		queryStr.append("  INSERT { ?subject meta:csvSeparatorSymbol ?new_separator_symbol } ");
-		queryStr.append("WHERE { ?subject meta:csvSeparatorSymbol ?separator_symbol . ");
+		queryStr.append("WHERE { OPTIONAL { ?subject meta:csvSeparatorSymbol ?separator_symbol . } ");
 		queryStr.append("}");
 
 		fuseki.update(queryStr);
@@ -699,10 +807,13 @@ public class DatasetService {
 		queryStr.setNsPrefix("dc", DCE);
 		queryStr.setNsPrefix("meta", META);
 		queryStr.setIri("subject", dataset.getDatasetUri());
-		queryStr.setIri("new_format", dataset.getSeparator().getUri().toString());
 		queryStr.append("  DELETE { ?subject dc:format ?format } ");
-		queryStr.append("  INSERT { ?subject dc:format ?new_format } ");
-		queryStr.append("WHERE { ?subject dc:format ?format . ");
+		Format format = dataset.getFormat();
+		if (format != null) {
+			queryStr.setIri("new_format", format.getUri().toString());
+			queryStr.append("  INSERT { ?subject dc:format ?new_format } ");
+		}
+		queryStr.append("WHERE { OPTIONAL { ?subject dc:format ?format . } ");
 		queryStr.append("}");
 
 		fuseki.update(queryStr);

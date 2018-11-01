@@ -55,7 +55,7 @@ public class SparqlService {
 		Resource nwb = new ClassPathResource(NWB_RESOURCE);
 		Resource meta = new ClassPathResource(META_RESOURCE);
 		Resource metadata = new ClassPathResource(METADATA_RESOURCE);
-		System.out.println(metadata.getFile().getAbsolutePath());
+		//System.out.println(metadata.getFile().getAbsolutePath());
 
 		defaultModel.read(nwb.getInputStream(), null, "TURTLE");
 		defaultModel.read(meta.getInputStream(), null, "TURTLE");

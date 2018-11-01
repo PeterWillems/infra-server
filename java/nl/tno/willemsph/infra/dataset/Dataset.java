@@ -50,10 +50,10 @@ public class Dataset {
 	}
 
 	public enum Format {
-		CSV, XLS, PDF, SPFF, XML, JSON, JSON_LD, TTL;
+		CSV, XLS, PDF, SPFF, XML, JSON, JSON_LD, TTL, PLAIN;
 
 		public static Format translate(URI format) {
-			switch (format.toString()) {
+			switch (format.toString().toLowerCase()) {
 			case SPARONTOLOGIES_NAMESPACE + "csv":
 				return CSV;
 			case SPARONTOLOGIES_NAMESPACE + "xls":
@@ -70,6 +70,8 @@ public class Dataset {
 				return JSON_LD;
 			case SPARONTOLOGIES_NAMESPACE + "ttl":
 				return TTL;
+			case SPARONTOLOGIES_NAMESPACE + "plain":
+				return PLAIN;
 			}
 			return null;
 		}
@@ -119,9 +121,9 @@ public class Dataset {
 		this.topicLabel = topicLabel;
 		this.contact = contact;
 		this.contactLabel = contactLabel;
-		this.decimalSymbol = DecimalSymbol.translate(decimalSymbol);
-		this.separator = Separator.translate(separator);
-		this.format = Format.translate(format);
+		this.decimalSymbol = decimalSymbol != null ? DecimalSymbol.translate(decimalSymbol) : null;
+		this.separator = separator != null ? Separator.translate(separator) : null;
+		this.format = format != null ? Format.translate(format) : null;
 	}
 
 	public String getDatasetUri() {

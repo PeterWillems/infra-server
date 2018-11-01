@@ -272,7 +272,7 @@ public class RoadSectionService {
 		geometry.setMultiLineString(multiLineStrings);
 		return geometry;
 	}
-	
+
 	public Geometry getCivilStructureGeometry(String uri) throws IOException {
 		Geometry geometry = null;
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
@@ -303,7 +303,7 @@ public class RoadSectionService {
 		geometry.setMultiLineString(multiLineStrings);
 		return geometry;
 	}
-	
+
 	public Geometry getCivilStructureGeometryForRoad(String uri, String road) throws IOException {
 		Geometry geometry = null;
 		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
@@ -678,13 +678,13 @@ public class RoadSectionService {
 			queryStr.setLiteral("roadNumber", roadId.get());
 			queryStr.append(";  nwb:WEGNUMMER ?roadNumber ");
 		}
-//		if (direction.isPresent()) {
-//			if (direction.get()) {
-//				queryStr.append(";  nwb:KANTCODE 'R' ");
-//			} else {
-//				queryStr.append(";  nwb:KANTCODE 'L' ");
-//			}
-//		}
+		// if (direction.isPresent()) {
+		// if (direction.get()) {
+		// queryStr.append("; nwb:KANTCODE 'R' ");
+		// } else {
+		// queryStr.append("; nwb:KANTCODE 'L' ");
+		// }
+		// }
 		if (beginKilometer.isPresent() || endKilometer.isPresent()) {
 			queryStr.append(";  nwb:BEGINKM ?beginKilometer ");
 			queryStr.append(";  nwb:EINDKM ?endKilometer ");
@@ -722,6 +722,74 @@ public class RoadSectionService {
 					node.get("propertyValue").get("value").asText(), currentCivilStructure);
 		}
 		return civilStructures;
+	}
+
+	public CivilStructure getCivilStructure(String localName) throws IOException {
+		String civilStructureUri = SparqlService.HOOFDWEGENNET_DATA + "#" + localName;
+		ParameterizedSparqlString queryStr = new ParameterizedSparqlString(fuseki.getPrefixMapping());
+		queryStr.setIri("civilStructure", civilStructureUri);
+		queryStr.append("SELECT ?graph ?kiwProperty ?propertyValue ");
+		queryStr.append("{");
+		queryStr.append("  GRAPH ?graph { ");
+		queryStr.append("  ?civilStructure rdf:type nwb:CivilStructure ;");
+		queryStr.append("	?kiwProperty ?propertyValue . ");
+		// queryStr.append("SELECT ?graph ?beginKm ?beginWdl ?doorrijhgt ?eindKm
+		// ?eindWdl ?fkVeld4 ?ibn ?inventOms ?iziSide ?kantCode ?objectId ?omschr
+		// ?wegnummer ");
+		// queryStr.append("{");
+		// queryStr.append(" GRAPH ?graph { ");
+		// queryStr.append(" ?civilStructure rdf:type nwb:CivilStructure ;");
+		// queryStr.append(" nwb:BEGINKM ?beginKm ; ");
+		// queryStr.append(" nwb:BEGINWDL ?beginWdl ; ");
+		// queryStr.append(" nwb:DOORRIJHGT ?doorrijhgt ; ");
+		// queryStr.append(" nwb:EINDKM ?eindKm ; ");
+		// queryStr.append(" nwb:EINDWDL ?eindWdl ; ");
+		// queryStr.append(" nwb:FK_VELD4 ?fkVeld4 ; ");
+		// queryStr.append(" nwb:IBN ?ibn ; ");
+		// queryStr.append(" nwb:INVENT_OMS ?inventOms ; ");
+		// queryStr.append(" nwb:IZI_SIDE ?iziSide ; ");
+		// queryStr.append(" nwb:KANTCODE ?kantCode ; ");
+		// queryStr.append(" nwb:OBJECTID ?objectId ; ");
+		// queryStr.append(" nwb:OMSCHR ?omschr ; ");
+		// queryStr.append(" nwb:WEGNUMMER ?wegnummer . ");
+		queryStr.append("  }");
+		queryStr.append("}");
+
+		JsonNode responseNodes = fuseki.query(queryStr);
+
+		CivilStructure civilStructure = new CivilStructure(civilStructureUri);
+		for (JsonNode node : responseNodes) {
+			String graph = node.get("graph").get("value").asText();
+			String roadId = graph.substring(graph.lastIndexOf('/') + 2);
+			getProperty(civilStructureUri, Optional.of(roadId), node.get("kiwProperty").get("value").asText(),
+					node.get("propertyValue").get("value").asText(), civilStructure);
+		}
+		return civilStructure;
+
+		// for (JsonNode node : responseNodes) {
+		// JsonNode inventOmsNode = node.get("inventOms");
+		// if (inventOmsNode != null) {
+		// CivilStructure civilStructure = new
+		// CivilStructure(SparqlService.HOOFDWEGENNET_DATA + "#" + localName);
+		// civilStructure.setInventOms(inventOmsNode != null ?
+		// inventOmsNode.get("value").asText() : null);
+		// civilStructure.setBeginKm(node.get("beginKm").get("value").asDouble());
+		// civilStructure.setBeginWdl(node.get("beginKm").get("value").asText());
+		// civilStructure.setDoorrijhgt(node.get("doorrijhgt").get("value").asDouble());
+		// civilStructure.setEindKm(node.get("eindKm").get("value").asDouble());
+		// civilStructure.setEindWdl(node.get("eindWdl").get("value").asText());
+		// civilStructure.setFkVeld4(node.get("fkVeld4").get("value").asText());
+		// civilStructure.setIbn(node.get("ibn").get("value").asText());
+		// civilStructure.setIziSide(node.get("iziSide").get("value").asText());
+		// civilStructure.setKantCode(node.get("kantCode").get("value").asText());
+		// civilStructure.setObjectId(node.get("objectId").get("value").asInt());
+		// civilStructure.setOmschr(node.get("omschr").get("value").asText());
+		// civilStructure.setWegnummer(node.get("wegnummer").get("value").asText());
+		// return civilStructure;
+		// }
+		// }
+		//
+		// return null;
 	}
 
 }

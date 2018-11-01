@@ -1,0 +1,971 @@
+# baseURI: https://w3id.org/metadata
+# imports: https://w3id.org/meta
+# prefix: metadata
+
+@prefix dc: <http://purl.org/dc/elements/1.1/> .
+@prefix meta: <https://w3id.org/meta#> .
+@prefix metadata: <https://w3id.org/metadata#> .
+@prefix mime: <http://www.sparontologies.net/mediatype/> .
+@prefix nwb: <https://w3id.org/nwb/hoofdwegennet#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://w3id.org/metadata>
+  rdf:type owl:Ontology ;
+  owl:imports <https://w3id.org/meta> ;
+  owl:versionInfo "Created with TopBraid Composer" ;
+.
+metadata:DataSet_1
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 1" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R006-1HRL-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R006-1HRL-2RL ;
+.
+metadata:DataSet_10
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 10" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R073-1HRL-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R073-1HRL-2RL ;
+.
+metadata:DataSet_11
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 11" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R073-1HRR-part1.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R073-1HRR-2RR-part1 ;
+.
+metadata:DataSet_12
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 12" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R073-1HRR-part2.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R073-1HRR-2RR-part2 ;
+.
+metadata:DataSet_2
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 2" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R007-1HRR-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2013-01-01"^^xsd:date ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R007-1HRR-1RR ;
+  meta:relatedToInfraObject metadata:R007-1HRR-2RR ;
+.
+metadata:DataSet_3
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 3" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R012-1HRL-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R012-1HRL-1RL ;
+  meta:relatedToInfraObject metadata:R012-1HRL-2RL ;
+  meta:relatedToInfraObject metadata:R012-1HRL-3RL ;
+.
+metadata:DataSet_4
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 4" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R012-1HRR-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R012-1HRR-1RR ;
+  meta:relatedToInfraObject metadata:R012-1HRR-2RR ;
+  meta:relatedToInfraObject metadata:R012-1HRR-3RR ;
+  meta:relatedToInfraObject metadata:R012-1HRR-4RR ;
+.
+metadata:DataSet_5
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 5" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R015-1HRR-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2011-01-01"^^xsd:date ;
+  meta:measurementYear "2011"^^xsd:gYear ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R015-1HRR-2RR ;
+.
+metadata:DataSet_6
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 6" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R027-1HRR-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2013-01-01"^^xsd:date ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R027-1HRR-2RR ;
+.
+metadata:DataSet_7
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 7" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R030-1HRL-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R030-1HRL-2RL ;
+.
+metadata:DataSet_8
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 8" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R050-1HRL-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R050-1HRL-2RL ;
+.
+metadata:DataSet_9
+  rdf:type meta:File ;
+  dc:format <http://www.sparontologies.net/mediatype/text/csv> ;
+  rdfs:label "Data set 9" ;
+  meta:contactPerson metadata:WillemVanAalst ;
+  meta:csvDecimalSymbol meta:COMMA ;
+  meta:csvSeparatorSymbol meta:DOT ;
+  meta:dataReference "https://365tno.sharepoint.com/teams/P060.31847/TeamDocuments/Team/Work/WP4%20Use%20case%20proefvak%20wegen/Steenverlies-Data/R067-1HRR-part.csv"^^xsd:anyURI ;
+  meta:forProject metadata:LVOv ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Ravelling ;
+  meta:measurementEndDate "2017-12-31"^^xsd:date ;
+  meta:measurementStartDate "2012-01-01"^^xsd:date ;
+  meta:measurementYear "2012"^^xsd:gYear ;
+  meta:measurementYear "2013"^^xsd:gYear ;
+  meta:measurementYear "2014"^^xsd:gYear ;
+  meta:measurementYear "2015"^^xsd:gYear ;
+  meta:measurementYear "2016"^^xsd:gYear ;
+  meta:measurementYear "2017"^^xsd:gYear ;
+  meta:quantityKindAndUnit metadata:baan ;
+  meta:quantityKindAndUnit metadata:meetjaar ;
+  meta:quantityKindAndUnit metadata:strook ;
+  meta:quantityKindAndUnit metadata:sv-m1 ;
+  meta:quantityKindAndUnit metadata:sv-m2 ;
+  meta:quantityKindAndUnit metadata:tot ;
+  meta:quantityKindAndUnit metadata:van ;
+  meta:quantityKindAndUnit metadata:weg ;
+  meta:relatedToInfraObject metadata:R067-1HRR-2RR ;
+.
+metadata:Dataset_100
+  rdf:type meta:Folder ;
+  dc:format <http://www.sparontologies.net/mediatype/text/plain> ;
+  rdfs:label "Data set 100" ;
+  meta:contactPerson metadata:JoepPaulissen ;
+  meta:dataReference "https://365tno.sharepoint.com/:f:/r/teams/P060.31847/TeamDocuments/Team/Work/WP5%20Digital%20Twin/DATA-INFRATOOL/StrainData_unzipped?csf=1"^^xsd:anyURI ;
+  meta:forProject metadata:KIP-DigitalTwin ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Fatigue ;
+  meta:measurementEndDate "2015-09-17"^^xsd:date ;
+  meta:measurementStartDate "2015-07-22"^^xsd:date ;
+  meta:relatedToInfraObject <https://w3id.org/nwb/hoofdwegennet/data#kunstinweg.fid-6bbfa409_1660fdc1587_39cf> ;
+.
+metadata:Dataset_101
+  rdf:type meta:Folder ;
+  dc:format <http://www.sparontologies.net/mediatype/text/plain> ;
+  rdfs:label "Data set 101" ;
+  meta:contactPerson metadata:JoepPaulissen ;
+  meta:csvDecimalSymbol meta:DOT ;
+  meta:csvSeparatorSymbol meta:COMMA ;
+  meta:dataReference "https://365tno.sharepoint.com/:f:/r/teams/P060.31847/TeamDocuments/Team/Work/WP5%20Digital%20Twin/DATA-INFRATOOL/StrainData_rainflow?csf=1"^^xsd:anyURI ;
+  meta:forProject metadata:KIP-DigitalTwin ;
+  meta:hasOwner metadata:RWS ;
+  meta:hasTopic meta:Fatigue ;
+  meta:measurementEndDate "2015-09-17"^^xsd:date ;
+  meta:measurementStartDate "2015-07-22"^^xsd:date ;
+  meta:relatedToInfraObject <https://w3id.org/nwb/hoofdwegennet/data#kunstinweg.fid-6bbfa409_1660fdc1587_39cf> ;
+  meta:zipped "false"^^xsd:boolean ;
+.
+metadata:JoepPaulissen
+  rdf:type meta:Person ;
+  rdfs:label "Joep Paulissen" ;
+  meta:eMailAddress "joep.paulissen@tno.nl" ;
+  meta:worksFor metadata:TNO ;
+.
+metadata:KIP-DigitalTwin
+  rdf:type meta:Project ;
+  rdfs:label "KIP Digital Twin" ;
+.
+metadata:LVOv
+  rdf:type meta:Project ;
+  rdfs:label "LVOv" ;
+.
+metadata:R006-1HRL-2RL
+  rdf:type meta:RoadPart ;
+  rdfs:label "R006-1HRL-2RL" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_1e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_1s ;
+.
+metadata:R007-1HRR-1RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R007-1HRR-1RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_2-1e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_2-1s ;
+.
+metadata:R007-1HRR-2RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R007-1HRR-2RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_2-2e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_2-2s ;
+.
+metadata:R012-1HRL-1RL
+  rdf:type meta:RoadPart ;
+  rdfs:label "R012-1HRL-1RL" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_3-1e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_3-1s ;
+.
+metadata:R012-1HRL-2RL
+  rdf:type meta:RoadPart ;
+  rdfs:label "R012-1HRL-2RL" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_3-2e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_3-2s ;
+.
+metadata:R012-1HRL-3RL
+  rdf:type meta:RoadPart ;
+  rdfs:label "R012-1HRL-3RL" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_3-3e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_3-3s ;
+.
+metadata:R012-1HRR-1RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R012-1HRR-1RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_4-1e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_4-1s ;
+.
+metadata:R012-1HRR-2RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R012-1HRR-2RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_4-2e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_4-2s ;
+.
+metadata:R012-1HRR-3RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R012-1HRR-3RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_4-3e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_4-3s ;
+.
+metadata:R012-1HRR-4RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R012-1HRR-4RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_4-4e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_4-4s ;
+.
+metadata:R015-1HRR-2RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R015-1HRR-2RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_5e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_5s ;
+.
+metadata:R027-1HRR-2RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R027-1HRR-2RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_6e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_6s ;
+.
+metadata:R030-1HRL-2RL
+  rdf:type meta:RoadPart ;
+  rdfs:label "R030-1HRL-2RL" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_7e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_7s ;
+.
+metadata:R050-1HRL-2RL
+  rdf:type meta:RoadPart ;
+  rdfs:label "R050-1HRL-2RL" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_8e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_8s ;
+.
+metadata:R067-1HRR-2RR
+  rdf:type meta:RoadPart ;
+  rdfs:label "R067-1HRR-2RR" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_9e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_9s ;
+.
+metadata:R073-1HRL-2RL
+  rdf:type meta:RoadPart ;
+  rdfs:label "R073-1HRL-2RL" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_10e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_10s ;
+.
+metadata:R073-1HRR-2RR-part1
+  rdf:type meta:RoadPart ;
+  rdfs:label "R073-1HRR-2RR-part1" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_11e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_11s ;
+.
+metadata:R073-1HRR-2RR-part2
+  rdf:type meta:RoadPart ;
+  rdfs:label "R073-1HRR-2RR-part2" ;
+  meta:endRoadNetworkLocation metadata:RoadNetworkLocation_12e ;
+  meta:startRoadNetworkLocation metadata:RoadNetworkLocation_12s ;
+.
+metadata:RWS
+  rdf:type meta:Organisation ;
+  rdfs:label "RWS" ;
+.
+metadata:RoadNetworkLocation_10e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 10e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "29,0" ;
+  meta:hectometerPostValue 29.0 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R073" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_10s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 10s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "34,9" ;
+  meta:hectometerPostValue 34.9 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R073" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_11e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 11e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "35,0" ;
+  meta:hectometerPostValue 35.0 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R073" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_11s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 11s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "29,0" ;
+  meta:hectometerPostValue 29.0 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R073" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_12e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 12e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "101,5" ;
+  meta:hectometerPostValue 101.5 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R073" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_12s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 12s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "100,2" ;
+  meta:hectometerPostValue 100.2 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R073" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_1e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 1e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "288,2" ;
+  meta:hectometerPostValue 288.2 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R006" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_1s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 1s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "292,4" ;
+  meta:hectometerPostValue 292.4 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R006" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_2-1e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 2e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "120,2" ;
+  meta:hectometerPostValue 120.2 ;
+  meta:laneReference "1RR" ;
+  meta:roadReference "R007" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_2-1s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 2s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "118,3" ;
+  meta:hectometerPostValue 118.3 ;
+  meta:laneReference "1RR" ;
+  meta:roadReference "R007" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_2-2e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 2e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "120,2" ;
+  meta:hectometerPostValue 120.2 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R007" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_2-2s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 2s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "118,3" ;
+  meta:hectometerPostValue 118.3 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R007" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_3-1e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 3-1e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "68,0" ;
+  meta:hectometerPostValue 68.1 ;
+  meta:laneReference "1RL" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_3-1s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 3-1s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "91,9" ;
+  meta:hectometerPostValue 91.9 ;
+  meta:laneReference "1RL" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_3-2e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 3-2e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "68,0" ;
+  meta:hectometerPostValue 68.0 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_3-2s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 3-2s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "91,9" ;
+  meta:hectometerPostValue 91.9 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_3-3e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 3-3e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "68,0" ;
+  meta:hectometerPostValue 68.0 ;
+  meta:laneReference "3RL" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_3-3s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 3-3s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "91,9" ;
+  meta:hectometerPostValue 91.9 ;
+  meta:laneReference "3RL" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_4-1e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-1s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "86,0" ;
+  meta:hectometerPostValue 86.0 ;
+  meta:laneReference "1RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_4-1s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-1s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "68,0" ;
+  meta:hectometerPostValue 68.0 ;
+  meta:laneReference "1RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_4-2e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-2e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "86,0" ;
+  meta:hectometerPostValue 86.0 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_4-2s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-2s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "68,0" ;
+  meta:hectometerPostValue 68.0 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_4-3e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-3s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "86,0" ;
+  meta:hectometerPostValue 86.0 ;
+  meta:laneReference "3RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_4-3s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-3s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "68,0" ;
+  meta:hectometerPostValue 68.0 ;
+  meta:laneReference "3RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_4-4e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-4s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "86,0" ;
+  meta:hectometerPostValue 86.0 ;
+  meta:laneReference "4RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_4-4s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 4-4s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "68,0" ;
+  meta:hectometerPostValue 68.0 ;
+  meta:laneReference "4RR" ;
+  meta:roadReference "R012" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_5e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 5e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "105,1" ;
+  meta:hectometerPostValue 105.1 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R015" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_5s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 5s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "101,4" ;
+  meta:hectometerPostValue 101.4 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R015" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_6e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 6e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "11,1" ;
+  meta:hectometerPostValue 11.1 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R027" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_6s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 6s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "2,3" ;
+  meta:hectometerPostValue 2.3 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R027" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_7e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 7e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "10,6" ;
+  meta:hectometerPostValue 10.6 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R030" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_7s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 7s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "15,4" ;
+  meta:hectometerPostValue 15.4 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R030" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_8e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 8e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "190,7" ;
+  meta:hectometerPostValue 190.7 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R050" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_8s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 8s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "192,6" ;
+  meta:hectometerPostValue 192.6 ;
+  meta:laneReference "2RL" ;
+  meta:roadReference "R050" ;
+  meta:wayReference "1HRL" ;
+.
+metadata:RoadNetworkLocation_9e
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 9e" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "28,0" ;
+  meta:hectometerPostValue 28.0 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R067" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:RoadNetworkLocation_9s
+  rdf:type meta:RoadNetworkLocation ;
+  rdfs:label "Road network location 9s" ;
+  meta:distance 0 ;
+  meta:hectometerPostReference "24,2" ;
+  meta:hectometerPostValue 24.2 ;
+  meta:laneReference "2RR" ;
+  meta:roadReference "R067" ;
+  meta:wayReference "1HRR" ;
+.
+metadata:TNO
+  rdf:type meta:Organisation ;
+  rdfs:label "TNO" ;
+.
+metadata:WillemVanAalst
+  rdf:type meta:Person ;
+  rdfs:label "Willem van Aalst" ;
+  meta:eMailAddress "willem.vanAalst@tno.nl" ;
+  meta:worksFor metadata:TNO ;
+.
+metadata:baan
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "baan"@nl ;
+.
+metadata:cumulative-number-of-cycles
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:comment "Aantal wisselingen in stuks" ;
+  rdfs:label "cumulative-number-of-cycles" ;
+  meta:quantityReference "cumulative-number-of-cycles" ;
+  meta:unitReference "amount" ;
+.
+metadata:damage-in-class
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:comment "bijdrage aan einheidsloze schade parameter D (grenswaarde is doorgaangs D = 1)" ;
+  rdfs:label "damage-in-class" ;
+  meta:quantityReference "damage-in-class" ;
+  meta:unitReference "amount" ;
+.
+metadata:meetjaar
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "meetjaar"@nl ;
+  meta:quantityReference "meetjaar" ;
+.
+metadata:number-of-cycles
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:comment "Aantal wisselingen in stuks" ;
+  rdfs:label "number-of-cycles" ;
+  meta:quantityReference "number-of-cycles" ;
+  meta:unitReference "amount" ;
+.
+metadata:range-class-from
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:comment "Spanning in het staal / de las in N/mm2" ;
+  rdfs:label "range-class-from" ;
+  meta:quantityReference "range-class-from" ;
+  meta:unitReference "N/mm2" ;
+.
+metadata:range-class-to
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:comment "Spanning in het staal / de las in N/mm2" ;
+  rdfs:label "range-class-to" ;
+  meta:quantityReference "range-class-to" ;
+  meta:unitReference "N/mm2" ;
+.
+metadata:strook
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "strook"@nl ;
+.
+metadata:sv-m1
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "sv-m1"@nl ;
+  meta:quantityReference "sv-m1" ;
+  meta:unitReference "amount" ;
+.
+metadata:sv-m2
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "sv-m2"@nl ;
+  meta:quantityReference "sv-m2" ;
+  meta:unitReference "amount" ;
+.
+metadata:tot
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "tot"@nl ;
+  meta:unitReference "km" ;
+.
+metadata:van
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "van"@nl ;
+  meta:unitReference "km" ;
+.
+metadata:weg
+  rdf:type meta:QuantityKindAndUnit ;
+  rdfs:label "weg"@nl ;
+.
